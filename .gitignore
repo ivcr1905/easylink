@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Custom Build Artifacts and Release Outputs
+*.apk
+*.ap_
+*.aab
+/app/build/
+/app/release/
