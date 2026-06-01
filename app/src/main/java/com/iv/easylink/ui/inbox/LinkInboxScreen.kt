@@ -94,7 +94,7 @@ fun LinkInboxScreen(
                         viewModel.deleteAllLinks()
                         showClearDialog = false
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Mulberry),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Primary),
                 ) { Text("Clear") }
             },
             dismissButton = {
@@ -159,7 +159,7 @@ private fun EmptyInboxState(modifier: Modifier = Modifier) {
             Icon(
                 imageVector = Icons.Default.Inbox,
                 contentDescription = null,
-                tint = MulberryMuted,
+                tint = PrimaryDisabled,
                 modifier = Modifier.size(72.dp),
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -231,7 +231,7 @@ private fun DateHeader(label: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.titleMedium,
-            color = Mulberry,
+            color = Primary,
         )
     }
 }
@@ -324,7 +324,7 @@ private fun LinkCard(
             DropdownMenuItem(
                 text = { Text("Open", color = Ink) },
                 leadingIcon = {
-                    Icon(Icons.Default.OpenInBrowser, contentDescription = null, tint = Mulberry)
+                    Icon(Icons.Default.OpenInBrowser, contentDescription = null, tint = Primary)
                 },
                 onClick = {
                     openUrl(context, link.url)
@@ -334,7 +334,7 @@ private fun LinkCard(
             DropdownMenuItem(
                 text = { Text("Copy", color = Ink) },
                 leadingIcon = {
-                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = Mulberry)
+                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = Primary)
                 },
                 onClick = {
                     copyToClipboard(context, link.url)
@@ -363,10 +363,11 @@ private fun SourceAppBadge(appName: String) {
     Text(
         text = appName,
         style = MaterialTheme.typography.labelSmall,
-        color = Mulberry,
+        color = Ink,
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(MulberryMuted)
+            .background(Canvas)
+            .border(1.dp, Hairline, RoundedCornerShape(50))
             .padding(horizontal = 10.dp, vertical = 4.dp),
     )
 }

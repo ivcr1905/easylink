@@ -11,27 +11,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 // ── Brand & Accent (from DESIGN.md) ─────────────────────────────────────────
-val Canvas         = Color(0xFFFCFAFB)   // pearl off-white floor
-val Mulberry       = Color(0xFF8B1E41)   // signature primary
-val MulberryActive = Color(0xFF691430)   // pressed / hover variant
-val MulberryMuted  = Color(0xFFE8D5DC)   // soft selected states
-val AccentRose     = Color(0xFFD96C8A)   // badges, spark icons
+val Canvas         = Color(0xFFFAF9F5)   // tinted cream canvas
+val Primary       = Color(0xFFCC785C)   // signature coral
+val PrimaryActive  = Color(0xFFA9583E)   // pressed / hover variant
+val PrimaryDisabled = Color(0xFFE6DFD8)   // desaturated cream-tinted disabled
+val AccentRose     = Color(0xFFC64545)   // using Error color from DESIGN.md for badges/errors
 
 // ── Surface ──────────────────────────────────────────────────────────────────
-val SurfaceSoft    = Color(0xFFF7F3F5)   // section dividers, soft bands
-val SurfaceCard    = Color(0xFFF5EFF2)   // card backgrounds
-val SurfaceDark    = Color(0xFF1A1316)   // dark mode canvas
-val SurfaceDarkElevated = Color(0xFF261D22) // elevated dark cards
-val Hairline       = Color(0xFFE6DCE0)   // 1px border tone
+val SurfaceSoft    = Color(0xFFF5F0E8)   // section dividers, soft bands
+val SurfaceCard    = Color(0xFFEFE9DE)   // card backgrounds
+val SurfaceDark    = Color(0xFF181715)   // dark mode canvas
+val SurfaceDarkElevated = Color(0xFF252320) // elevated dark cards
+val Hairline       = Color(0xFFE6DFD8)   // 1px border tone
 
 // ── Text ─────────────────────────────────────────────────────────────────────
-val Ink            = Color(0xFF1A1517)   // headlines, primary text
-val BodyStrong     = Color(0xFF2E262A)   // emphasized paragraphs, link titles
-val Body           = Color(0xFF4A4045)   // running body text
-val Muted          = Color(0xFF786B72)   // URLs, metadata, dates
-val OnPrimary      = Color(0xFFFFFFFF)   // text on mulberry buttons
-val OnDark         = Color(0xFFFCFAFB)   // text on dark surfaces
-val OnDarkMuted    = Color(0xFFA69B9F)   // secondary text in dark mode
+val Ink            = Color(0xFF141413)   // headlines, primary text
+val BodyStrong     = Color(0xFF252523)   // emphasized paragraphs, link titles
+val Body           = Color(0xFF3D3D3A)   // running body text
+val Muted          = Color(0xFF6C6A64)   // URLs, metadata, dates
+val OnPrimary      = Color(0xFFFFFFFF)   // text on coral buttons
+val OnDark         = Color(0xFFFAF9F5)   // text on dark surfaces
+val OnDarkMuted    = Color(0xFFA09D96)   // secondary text in dark mode
 
 // ── Font Families ────────────────────────────────────────────────────────────
 // System serif/sans as Lora + Inter stand-ins.
@@ -41,9 +41,9 @@ val Inter = FontFamily.SansSerif
 
 // ── Color Scheme ─────────────────────────────────────────────────────────────
 private val EasyLinkColorScheme = lightColorScheme(
-    primary           = Mulberry,
+    primary           = Primary,
     onPrimary         = OnPrimary,
-    primaryContainer  = MulberryMuted,
+    primaryContainer  = PrimaryDisabled,
     background        = Canvas,
     surface           = Canvas,
     onBackground      = Ink,
@@ -60,12 +60,14 @@ private val EasyLinkTypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 48.sp,
         lineHeight = 52.8.sp,
+        letterSpacing = (-1).sp,
     ),
     displayMedium = TextStyle(
         fontFamily = Lora,
         fontWeight = FontWeight.Normal,
         fontSize = 28.sp,
-        lineHeight = 34.sp,
+        lineHeight = 33.6.sp,
+        letterSpacing = (-0.3).sp,
     ),
     // Inter for all UI labels and body
     titleLarge = TextStyle(

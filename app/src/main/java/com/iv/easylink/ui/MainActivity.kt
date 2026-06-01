@@ -119,13 +119,13 @@ fun OnboardingScreen(onContinue: () -> Unit = {}) {
                 modifier = Modifier
                     .size(72.dp)
                     .clip(CircleShape)
-                    .background(if (hasPermission) MulberryMuted else Mulberry),
+                    .background(if (hasPermission) PrimaryDisabled else Primary),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = if (hasPermission) Icons.Default.Check else Icons.Default.Link,
                     contentDescription = null,
-                    tint = if (hasPermission) Mulberry else OnPrimary,
+                    tint = if (hasPermission) Primary else OnPrimary,
                     modifier = Modifier.size(36.dp),
                 )
             }
@@ -154,7 +154,7 @@ fun OnboardingScreen(onContinue: () -> Unit = {}) {
                 textAlign = TextAlign.Center,
             )
 
-            // ── Privacy note — ai-summary-box style from DESIGN.md ────────────
+            // ── Privacy note ──────────────────────────────────────────────────
             if (!hasPermission) {
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -166,13 +166,6 @@ fun OnboardingScreen(onContinue: () -> Unit = {}) {
                         .background(Canvas)
                         .border(1.dp, Hairline, RoundedCornerShape(8.dp)),
                 ) {
-                    // 2px left mulberry bar (ai-summary-box accent from DESIGN.md)
-                    Box(
-                        modifier = Modifier
-                            .width(3.dp)
-                            .fillMaxHeight()
-                            .background(Mulberry),
-                    )
                     Text(
                         text = "All link detection happens 100% on your device. We never store, read, or share your messages.",
                         style = MaterialTheme.typography.bodySmall,
@@ -184,7 +177,7 @@ fun OnboardingScreen(onContinue: () -> Unit = {}) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ── Primary CTA — Mulberry, 8dp radius per DESIGN.md ─────────────
+            // ── Primary CTA — 8dp radius, 40dp height per DESIGN.md ──────────
             Button(
                 onClick = {
                     if (hasPermission) {
@@ -208,18 +201,18 @@ fun OnboardingScreen(onContinue: () -> Unit = {}) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(40.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Mulberry,
+                    containerColor = Primary,
                     contentColor = OnPrimary,
-                    disabledContainerColor = MulberryMuted,
-                    disabledContentColor = Mulberry,
+                    disabledContainerColor = PrimaryDisabled,
+                    disabledContentColor = Muted,
                 ),
             ) {
                 Text(
                     text = if (hasPermission) "Continue to Link Inbox →" else "Grant Permission",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
