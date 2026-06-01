@@ -8,6 +8,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import com.iv.easylink.utils.LinkExtractor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // We use Activity instead of ComponentActivity/AppCompatActivity because we don't need a UI at all.
 class ShareReceiverActivity : Activity() {
@@ -28,12 +31,27 @@ class ShareReceiverActivity : Activity() {
                     clipboard.setPrimaryClip(clip)
                     // 4. Show a quick confirmation Toast
                     Toast.makeText(this, "Link copied by EasyLink!", Toast.LENGTH_SHORT).show()
+
+                    // 5. Phase 2: persist the shared link to the database
+                    val repository = (application as EasyLinkApplication).linkRepository
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            repository.saveLink(
+                                url = url,
+                                sourceApp = "Shared",
+                                senderName = "Shared via Share Sheet",
+                                isSuspicious = com.iv.easylink.utils.SecurityScanner.isSuspiciousUrl(url),
+                            )
+                        } catch (_: Exception) {
+                            // Best-effort save — don't crash the share flow
+                        }
+                    }
                 } else {
                     Toast.makeText(this, "No link found to copy.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-        // 5. CRITICAL: Instantly kill the activity so the user stays in Instagram/WhatsApp seamlessly
+        // 6. CRITICAL: Instantly kill the activity so the user stays in Instagram/WhatsApp seamlessly
         finish()
     }
 }

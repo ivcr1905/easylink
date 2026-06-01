@@ -18,11 +18,24 @@ import androidx.core.net.toUri
 import com.iv.easylink.R
 import androidx.core.graphics.drawable.toBitmap
 import android.graphics.Bitmap
+import com.iv.easylink.EasyLinkApplication
+import com.iv.easylink.data.repository.LinkRepository
 import com.iv.easylink.utils.SecurityScanner.isSuspiciousUrl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class LinkNotificationListener : NotificationListenerService() {
     private var lastProcessedKey: String? = null
     private var lastProcessedUrl: String? = null
+
+    /** Coroutine scope tied to the service lifecycle for DB writes. */
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** Repository obtained from the Application singleton. */
+    private lateinit var linkRepository: LinkRepository
 
     companion object {
         private const val CHANNEL_ID = "easyLink_detected_links"
@@ -31,7 +44,14 @@ class LinkNotificationListener : NotificationListenerService() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        linkRepository = (application as EasyLinkApplication).linkRepository
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         try {
@@ -78,6 +98,21 @@ class LinkNotificationListener : NotificationListenerService() {
             } catch (e: Exception) {
                 // Failsafe in case the app icon can't be found
             }
+
+            // ── Phase 2: persist the link to the local database ──────────────
+            serviceScope.launch {
+                try {
+                    linkRepository.saveLink(
+                        url = primaryLink,
+                        sourceApp = appName,
+                        senderName = senderName,
+                        isSuspicious = isSuspicious,
+                    )
+                } catch (e: Exception) {
+                    Log.e("EasyLink", "Failed to save link to database", e)
+                }
+            }
+
             showLinkNotification(primaryLink, isSuspicious, senderName, appName, appIconBitmap)
         } catch (e : Exception){
             Log.e("EasyLink", "Failed to process notification safely", e)

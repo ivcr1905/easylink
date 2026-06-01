@@ -20,100 +20,60 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.iv.easylink.ui.inbox.LinkInboxScreen
+import com.iv.easylink.ui.theme.*
 
-// ── Brand Colors (from DESIGN.md) ────────────────────────────────────────────
-private val Canvas = Color(0xFFFCFAFB) // pearl off-white floor
-private val Mulberry = Color(0xFF8B1E41) // signature primary
-private val MulberryActive = Color(0xFF691430) // pressed/hover variant
-private val MulberryMuted = Color(0xFFE8D5DC) // soft selected states
-private val SurfaceCard = Color(0xFFF5EFF2) // card background
-private val Hairline = Color(0xFFE6DCE0) // 1px borders
-private val Ink = Color(0xFF1A1517) // primary text / headlines
-private val Body = Color(0xFF4A4045) // running body text
-private val Muted = Color(0xFF786B72) // metadata, URLs
-private val OnPrimary = Color(0xFFFFFFFF) // text on mulberry buttons
-
-// ── Font Families ────────────────────────────────────────────────────────────
-// Using system serif/sans for phase 1. Swap in bundled Lora + Inter TTFs in phase 2.
-private val Lora = FontFamily.Serif
-private val Inter = FontFamily.SansSerif
-
-// ── Theme ─────────────────────────────────────────────────────────────────────
-@Composable
-fun EasyLinkTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = Mulberry,
-            onPrimary = OnPrimary,
-            primaryContainer = MulberryMuted,
-            background = Canvas,
-            surface = Canvas,
-            onBackground = Ink,
-            onSurface = Ink,
-            onSurfaceVariant = Body,
-            outline = Hairline,
-        ),
-        typography = Typography(
-            // Lora serif for display — weight 400 per DESIGN.md (bold ruins editorial look)
-            displayMedium = TextStyle(
-                fontFamily = Lora,
-                fontWeight = FontWeight.Normal,
-                fontSize = 28.sp,
-                lineHeight = 34.sp,
-            ),
-            // Inter for all UI labels and body
-            titleMedium = TextStyle(
-                fontFamily = Inter,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp,
-                lineHeight = 22.sp,
-            ),
-            bodyLarge = TextStyle(
-                fontFamily = Inter,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                lineHeight = 25.6.sp,
-            ),
-            bodySmall = TextStyle(
-                fontFamily = Inter,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                lineHeight = 21.sp,
-            ),
-            labelSmall = TextStyle(
-                fontFamily = Inter,
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
-                lineHeight = 16.8.sp,
-            ),
-        ),
-        content = content,
-    )
+// ── Navigation route constants ───────────────────────────────────────────────
+private object Routes {
+    const val ONBOARDING = "onboarding"
+    const val INBOX = "inbox"
 }
 
-// ── Activity ──────────────────────────────────────────────────────────────────
+// ── Activity ─────────────────────────────────────────────────────────────────
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             EasyLinkTheme {
+                val context = LocalContext.current
+                val hasPermission = checkNotificationPermission(context)
+
+                // Start destination: inbox if permission already granted, onboarding otherwise
+                val startDestination = if (hasPermission) Routes.INBOX else Routes.ONBOARDING
+
+                val navController = rememberNavController()
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Canvas,
                 ) {
-                    OnboardingScreen()
+                    NavHost(
+                        navController = navController,
+                        startDestination = startDestination,
+                    ) {
+                        composable(Routes.ONBOARDING) {
+                            OnboardingScreen(
+                                onContinue = {
+                                    navController.navigate(Routes.INBOX) {
+                                        popUpTo(Routes.ONBOARDING) { inclusive = true }
+                                    }
+                                },
+                            )
+                        }
+                        composable(Routes.INBOX) {
+                            LinkInboxScreen()
+                        }
+                    }
                 }
             }
         }
@@ -122,7 +82,7 @@ class MainActivity : ComponentActivity() {
 
 // ── Onboarding Screen ─────────────────────────────────────────────────────────
 @Composable
-fun OnboardingScreen() {
+fun OnboardingScreen(onContinue: () -> Unit = {}) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var hasPermission by remember { mutableStateOf(checkNotificationPermission(context)) }
@@ -227,7 +187,10 @@ fun OnboardingScreen() {
             // ── Primary CTA — Mulberry, 8dp radius per DESIGN.md ─────────────
             Button(
                 onClick = {
-                    if (!hasPermission) {
+                    if (hasPermission) {
+                        // Permission already granted — proceed to inbox
+                        onContinue()
+                    } else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             val granted = androidx.core.content.ContextCompat.checkSelfPermission(
                                 context, android.Manifest.permission.POST_NOTIFICATIONS
@@ -253,10 +216,9 @@ fun OnboardingScreen() {
                     disabledContainerColor = MulberryMuted,
                     disabledContentColor = Mulberry,
                 ),
-                enabled = !hasPermission,
             ) {
                 Text(
-                    text = if (hasPermission) "Permission Granted ✓" else "Grant Permission",
+                    text = if (hasPermission) "Continue to Link Inbox →" else "Grant Permission",
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
