@@ -36,6 +36,38 @@ class LinkProcessingTest {
     }
 
     @Test
+    fun `instagram content links discard the complete tracking query`() {
+        val cleaned = LinkCleaner.clean(
+            "https://www.instagram.com/reel/ABC123/?igsh=tracking&unknown_share_token=also_tracking",
+        )
+        assertEquals("https://www.instagram.com/reel/ABC123/", cleaned)
+    }
+
+    @Test
+    fun `instagram redirect links preserve their functional destination`() {
+        val dirty = "https://l.instagram.com/?u=https%3A%2F%2Fexample.com%2Farticle&igsh=tracking"
+        assertEquals("https://l.instagram.com/?u=https%3A%2F%2Fexample.com%2Farticle", LinkCleaner.clean(dirty))
+    }
+
+    @Test
+    fun `known social trackers are removed without dropping functional values`() {
+        assertEquals(
+            "https://www.tiktok.com/@creator/video/123",
+            LinkCleaner.clean("https://www.tiktok.com/@creator/video/123?_r=1&_t=tracking"),
+        )
+        assertEquals(
+            "https://open.spotify.com/track/123?context=album",
+            LinkCleaner.clean("https://open.spotify.com/track/123?si=tracking&context=album"),
+        )
+    }
+
+    @Test
+    fun `facebook functional parameters survive universal tracker removal`() {
+        val cleaned = LinkCleaner.clean("https://www.facebook.com/story.php?story_fbid=123&id=456&fbclid=tracking")
+        assertEquals("https://www.facebook.com/story.php?story_fbid=123&id=456", cleaned)
+    }
+
+    @Test
     fun `categorizer recognizes common destinations`() {
         assertEquals(LinkCategory.VIDEO, LinkCategorizer.categorize("youtu.be", "https://youtu.be/id"))
         assertEquals(LinkCategory.DEVELOPMENT, LinkCategorizer.categorize("github.com", "https://github.com/openai"))

@@ -78,7 +78,8 @@ private fun InsightSection(title: String, rows: List<CountByKey>, colors: List<C
                         Text(row.count.toString(), color = EasyLinkTheme.extraColors.mutedText)
                     }
                     Box(Modifier.fillMaxWidth().padding(top = 5.dp).height(7.dp).background(MaterialTheme.colorScheme.outline.copy(alpha = .25f), MaterialTheme.shapes.extraSmall)) {
-                        Box(Modifier.fillMaxWidth(row.count.toFloat() / maximum).height(7.dp).background(colors[index % colors.size], MaterialTheme.shapes.extraSmall))
+                        val barColor = if (colors.isEmpty()) MaterialTheme.colorScheme.primary else colors[index % colors.size]
+                        Box(Modifier.fillMaxWidth(row.count.toFloat() / maximum).height(7.dp).background(barColor, MaterialTheme.shapes.extraSmall))
                     }
                 }
             }

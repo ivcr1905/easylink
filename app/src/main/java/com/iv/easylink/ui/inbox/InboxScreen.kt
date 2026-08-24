@@ -134,7 +134,8 @@ fun InboxScreen(viewModel: EasyLinkViewModel) {
                 ) {
                     itemsIndexed(links, key = { _, link -> link.id }) { index, link ->
                         val label = dateLabel(link.timestamp)
-                        if (index == 0 || dateLabel(links[index - 1].timestamp) != label) {
+                        val previousTimestamp = links.getOrNull(index - 1)?.timestamp
+                        if (previousTimestamp == null || dateLabel(previousTimestamp) != label) {
                             Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp, bottom = 2.dp))
                         }
                         LinkSwipeCard(

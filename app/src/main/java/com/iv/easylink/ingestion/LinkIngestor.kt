@@ -18,17 +18,44 @@ data class IngestedLink(
     val suspicious: Boolean,
 )
 
+data class PreparedLink(
+    val url: String,
+    val host: String,
+    val category: Int,
+    val suspicious: Boolean,
+    val wasCleaned: Boolean,
+)
+
 class LinkIngestor(private val repository: LinkRepository) {
-    suspend fun ingest(text: CharSequence?, source: LinkSource): List<IngestedLink> {
+    fun prepare(text: CharSequence?): List<PreparedLink> {
         val urls = LinkExtractor.extractLinks(text)
         if (urls.isEmpty()) return emptyList()
-        val rules = repository.enabledRules()
-        val saved = ArrayList<IngestedLink>(urls.size)
+        val prepared = ArrayList<PreparedLink>(urls.size)
         urls.forEach { extracted ->
             val processed = LinkExtractor.process(extracted) ?: return@forEach
+            prepared.add(
+                PreparedLink(
+                    url = processed.url,
+                    host = processed.host,
+                    category = LinkCategorizer.categorize(processed.host, processed.url).code,
+                    suspicious = SecurityScanner.isSuspiciousUrl(processed.url),
+                    wasCleaned = processed.wasCleaned,
+                ),
+            )
+        }
+        return prepared
+    }
+
+    suspend fun ingest(text: CharSequence?, source: LinkSource): List<IngestedLink> =
+        ingestPrepared(prepare(text), source)
+
+    suspend fun ingestPrepared(prepared: List<PreparedLink>, source: LinkSource): List<IngestedLink> {
+        if (prepared.isEmpty()) return emptyList()
+        val rules = repository.enabledRules()
+        val saved = ArrayList<IngestedLink>(prepared.size)
+        prepared.forEach { processed ->
             val rule = rules.firstOrNull { it.matches(processed.host, processed.url) }
-            val category = rule?.category ?: LinkCategorizer.categorize(processed.host, processed.url).code
-            val suspicious = SecurityScanner.isSuspiciousUrl(processed.url)
+            val category = rule?.category ?: processed.category
             val id = repository.saveLink(
                 NewLink(
                     url = processed.url,
@@ -36,12 +63,12 @@ class LinkIngestor(private val repository: LinkRepository) {
                     sourcePackage = source.packageName,
                     sourceApp = source.appName.take(80),
                     category = category,
-                    isSuspicious = suspicious,
+                    isSuspicious = processed.suspicious,
                     wasCleaned = processed.wasCleaned,
                 ),
             ) ?: return@forEach
             rule?.collectionId?.let { repository.addToCollection(id, it) }
-            saved.add(IngestedLink(id, processed.url, suspicious))
+            saved.add(IngestedLink(id, processed.url, processed.suspicious))
         }
         return saved
     }

@@ -1,6 +1,7 @@
 package com.iv.easylink.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.iv.easylink.EasyLinkApplication
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -111,14 +113,16 @@ class EasyLinkViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun createCollection(name: String) = viewModelScope.launch {
+    fun createCollection(name: String) = launchSafely("create collection") {
         if (name.isNotBlank()) repository.createCollection(name.take(40), collections.value.size % 8)
     }
-    fun deleteCollection(id: Long) = viewModelScope.launch { repository.deleteCollection(id) }
-    fun renameCollection(id: Long, name: String) = viewModelScope.launch { if (name.isNotBlank()) repository.renameCollection(id, name) }
-    fun createRule(name: String, host: String, category: Int?, collectionId: Long?) = viewModelScope.launch {
+    fun deleteCollection(id: Long) = launchSafely("delete collection") { repository.deleteCollection(id) }
+    fun renameCollection(id: Long, name: String) = launchSafely("rename collection") {
+        if (name.isNotBlank()) repository.renameCollection(id, name)
+    }
+    fun createRule(name: String, host: String, category: Int?, collectionId: Long?) = launchSafely("create automation rule") {
         val cleanHost = host.trim().lowercase().removePrefix("https://").removePrefix("http://").substringBefore('/')
-        if (name.isBlank() || cleanHost.isBlank() || (category == null && collectionId == null)) return@launch
+        if (name.isBlank() || cleanHost.isBlank() || (category == null && collectionId == null)) return@launchSafely
         repository.createRule(
             AutomationRuleEntity(
                 name = name.take(50), hostPattern = cleanHost.take(253), category = category,
@@ -126,23 +130,27 @@ class EasyLinkViewModel(application: Application) : AndroidViewModel(application
             ),
         )
     }
-    fun toggleRule(rule: AutomationRuleEntity) = viewModelScope.launch { repository.updateRule(rule.copy(enabled = !rule.enabled)) }
-    fun editRule(rule: AutomationRuleEntity, name: String, host: String, category: Int?, collectionId: Long?) = viewModelScope.launch {
+    fun toggleRule(rule: AutomationRuleEntity) = launchSafely("toggle automation rule") {
+        repository.updateRule(rule.copy(enabled = !rule.enabled))
+    }
+    fun editRule(rule: AutomationRuleEntity, name: String, host: String, category: Int?, collectionId: Long?) = launchSafely("edit automation rule") {
         val cleanHost = host.trim().lowercase().removePrefix("https://").removePrefix("http://").substringBefore('/')
         if (name.isNotBlank() && cleanHost.isNotBlank()) {
             repository.updateRule(rule.copy(name = name.take(50), hostPattern = cleanHost.take(253), category = category, collectionId = collectionId))
         }
     }
-    fun moveRule(rule: AutomationRuleEntity, direction: Int) = viewModelScope.launch {
-        val current = rules.value.indexOfFirst { it.id == rule.id }
-        val target = (current + direction).coerceIn(0, rules.value.lastIndex)
-        if (current >= 0 && target != current) {
-            val other = rules.value[target]
-            repository.updateRule(rule.copy(priority = other.priority))
-            repository.updateRule(other.copy(priority = rule.priority))
-        }
+    fun moveRule(rule: AutomationRuleEntity, direction: Int) = launchSafely("reorder automation rule") {
+        val snapshot = rules.value
+        if (snapshot.size < 2) return@launchSafely
+        val current = snapshot.indexOfFirst { it.id == rule.id }
+        if (current < 0) return@launchSafely
+        val target = current + direction
+        if (target !in snapshot.indices) return@launchSafely
+        val other = snapshot[target]
+        repository.updateRule(rule.copy(priority = other.priority))
+        repository.updateRule(other.copy(priority = rule.priority))
     }
-    fun deleteRule(id: Long) = viewModelScope.launch { repository.deleteRule(id) }
+    fun deleteRule(id: Long) = launchSafely("delete automation rule") { repository.deleteRule(id) }
 
     fun setAppearance(value: AppearanceMode) = container.settings.setAppearanceMode(value)
     fun setRichPreviews(value: Boolean) = container.settings.setRichPreviews(value)
@@ -152,4 +160,18 @@ class EasyLinkViewModel(application: Application) : AndroidViewModel(application
     }
     fun setPackageIgnored(packageName: String, ignored: Boolean) = container.settings.setPackageIgnored(packageName, ignored)
     fun setOnboardingSeen() = container.settings.setOnboardingSeen()
+
+    private fun launchSafely(operation: String, block: suspend () -> Unit) = viewModelScope.launch {
+        try {
+            block()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            Log.e(LOG_TAG, "Unable to $operation", error)
+        }
+    }
+
+    private companion object {
+        const val LOG_TAG = "EasyLink"
+    }
 }

@@ -12,9 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -72,27 +71,7 @@ fun LibraryScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item { SectionTitle("Categories", "Automatic, on-device organization") }
-        item {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(145.dp),
-                userScrollEnabled = false,
-                modifier = Modifier.height((((LinkCategory.entries.size + 1) / 2) * 92).dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                items(LinkCategory.entries, key = { it.code }) { category ->
-                    Card(
-                        Modifier.fillMaxWidth().clickable { onOpenCategory(category.code) },
-                        colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.categoryColors[category.code].copy(alpha = .16f)),
-                    ) {
-                        Column(Modifier.padding(15.dp)) {
-                            Text(category.label, style = MaterialTheme.typography.titleMedium)
-                            Text("View links", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText)
-                        }
-                    }
-                }
-            }
-        }
+        item { CategoryGrid(onOpenCategory) }
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 SectionTitle("Collections", "Your own reading lists", Modifier.weight(1f))
@@ -100,14 +79,14 @@ fun LibraryScreen(
             }
         }
         if (collections.isEmpty()) item { EmptyLibraryCard("No collections", "Create Watch Later, Wishlist, Research, or anything else.") }
-        items(collections.size, key = { collections[it].id }) { index ->
-            val collection = collections[index]
+        // Collection and rule IDs come from separate tables and can be equal. LazyColumn keys cannot.
+        items(collections, key = { "collection:${it.id}" }) { collection ->
             Card(
                 Modifier.fillMaxWidth().clickable { onOpenCollection(collection.id, collection.name) },
                 colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card),
             ) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Folder, null, tint = EasyLinkTheme.extraColors.categoryColors[collection.colorToken.coerceIn(0, 8)])
+                    Icon(Icons.Default.Folder, null, tint = categoryColor(collection.colorToken))
                     Column(Modifier.padding(horizontal = 12.dp).weight(1f)) {
                         Text(collection.name, style = MaterialTheme.typography.titleMedium)
                         Text("${collection.linkCount} link${if (collection.linkCount == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText)
@@ -125,7 +104,15 @@ fun LibraryScreen(
         }
         if (collections.isEmpty()) item { Text("Create a collection before adding an automation rule.", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText) }
         if (rules.isEmpty() && collections.isNotEmpty()) item { EmptyLibraryCard("No rules yet", "Example: youtube.com → Watch Later") }
-        items(rules.size, key = { rules[it].id }) { index -> RuleRow(rules[index], index, rules.lastIndex, collections, viewModel) }
+        itemsIndexed(rules, key = { _, rule -> "rule:${rule.id}" }) { index, rule ->
+            RuleRow(
+                rule = rule,
+                canMoveUp = index > 0,
+                canMoveDown = index >= 0 && index < rules.lastIndex,
+                collections = collections,
+                viewModel = viewModel,
+            )
+        }
         item { Spacer(Modifier.height(80.dp)) }
     }
     if (addCollection) NameDialog("New collection", "Collection name", onDismiss = { addCollection = false }) {
@@ -140,6 +127,50 @@ fun LibraryScreen(
         viewModel.createRule(name, host, category, collection); addRule = false
     }
 }
+
+@Composable
+private fun CategoryGrid(onOpenCategory: (Int) -> Unit) {
+    val categories = LinkCategory.entries
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        for (rowStart in categories.indices step 2) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                CategoryCard(categories[rowStart], Modifier.weight(1f), onOpenCategory)
+                val second = rowStart + 1
+                if (second < categories.size) {
+                    CategoryCard(categories[second], Modifier.weight(1f), onOpenCategory)
+                } else {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryCard(
+    category: LinkCategory,
+    modifier: Modifier,
+    onOpenCategory: (Int) -> Unit,
+) {
+    Card(
+        modifier = modifier.clickable { onOpenCategory(category.code) },
+        colors = CardDefaults.cardColors(
+            containerColor = categoryColor(category.code).copy(alpha = .16f),
+        ),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(15.dp)) {
+            Text(category.label, style = MaterialTheme.typography.titleMedium)
+            Text("View links", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText)
+        }
+    }
+}
+
+@Composable
+private fun categoryColor(token: Int) =
+    EasyLinkTheme.extraColors.categoryColors.getOrNull(token) ?: MaterialTheme.colorScheme.primary
 
 @Composable
 private fun SectionTitle(title: String, subtitle: String, modifier: Modifier = Modifier) {
@@ -157,9 +188,15 @@ private fun EmptyLibraryCard(title: String, body: String) {
 }
 
 @Composable
-private fun RuleRow(rule: AutomationRuleEntity, index: Int, lastIndex: Int, collections: List<CollectionSummary>, viewModel: EasyLinkViewModel) {
-    var edit by remember { mutableStateOf(false) }
-    var menu by remember { mutableStateOf(false) }
+private fun RuleRow(
+    rule: AutomationRuleEntity,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    collections: List<CollectionSummary>,
+    viewModel: EasyLinkViewModel,
+) {
+    var edit by remember(rule.id) { mutableStateOf(false) }
+    var menu by remember(rule.id) { mutableStateOf(false) }
     val target = collections.firstOrNull { it.id == rule.collectionId }?.name
         ?: rule.category?.let { LinkCategory.fromCode(it).label } ?: "No target"
     Card(colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card), modifier = Modifier.fillMaxWidth()) {
@@ -173,8 +210,8 @@ private fun RuleRow(rule: AutomationRuleEntity, index: Int, lastIndex: Int, coll
             Box {
                 IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "Rule actions") }
                 DropdownMenu(menu, { menu = false }) {
-                    DropdownMenuItem({ Text("Move up") }, { viewModel.moveRule(rule, -1); menu = false }, enabled = index > 0, leadingIcon = { Icon(Icons.Default.ArrowUpward, null) })
-                    DropdownMenuItem({ Text("Move down") }, { viewModel.moveRule(rule, 1); menu = false }, enabled = index < lastIndex, leadingIcon = { Icon(Icons.Default.ArrowDownward, null) })
+                    DropdownMenuItem({ Text("Move up") }, { viewModel.moveRule(rule, -1); menu = false }, enabled = canMoveUp, leadingIcon = { Icon(Icons.Default.ArrowUpward, null) })
+                    DropdownMenuItem({ Text("Move down") }, { viewModel.moveRule(rule, 1); menu = false }, enabled = canMoveDown, leadingIcon = { Icon(Icons.Default.ArrowDownward, null) })
                     DropdownMenuItem({ Text("Edit") }, { edit = true; menu = false }, leadingIcon = { Icon(Icons.Default.Edit, null) })
                     DropdownMenuItem({ Text("Delete", color = MaterialTheme.colorScheme.error) }, { viewModel.deleteRule(rule.id); menu = false }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null, tint = MaterialTheme.colorScheme.error) })
                 }
@@ -246,8 +283,7 @@ fun CollectionScreen(viewModel: EasyLinkViewModel, collectionId: Long) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("This collection is empty", color = EasyLinkTheme.extraColors.mutedText) }
     } else {
         LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(links.size, key = { links[it].id }) { index ->
-                val link = links[index]
+            items(links, key = { it.id }) { link ->
                 Card(Modifier.fillMaxWidth().clickable { openUrl(context, link.url) }, colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card)) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Link, null, tint = MaterialTheme.colorScheme.primary)

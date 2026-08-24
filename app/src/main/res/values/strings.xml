@@ -3,6 +3,10 @@
     <string name="source_shared">Shared via Android</string>
     <string name="unknown_app">Unknown app</string>
     <string name="no_link_found">No new link found</string>
+    <string name="clean_link_clip_label">Tracker-free link</string>
+    <string name="clean_link_copied">Tracker-free link copied</string>
+    <string name="clean_link_copied_and_saved">Tracker-free link copied and saved</string>
+    <string name="share_failed">Could not copy or save this link</string>
     <string name="suspicious_link_title">Potentially unsafe link</string>
     <string name="link_detected">Link detected</string>
     <string name="copy">Copy</string>
