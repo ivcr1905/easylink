@@ -1,142 +1,67 @@
 # EasyLink
 
-**EasyLink** is a lightweight Android app that watches your incoming notifications for URLs and surfaces them as instant, one-tap actions — copy to clipboard or open in browser — without you ever unlocking the full notification.
+EasyLink is a local-first Android link inbox. It detects links in notifications, accepts links from Android's share sheet or manual entry, cleans common tracking parameters, categorizes them, and keeps them organized without accounts or an EasyLink backend.
 
-Built with Kotlin and Jetpack Compose. No backend, no analytics, no accounts. Everything runs locally on your device.
+## MVP features
 
----
+- Multi-link extraction across common notification styles
+- Quick Open and Copy notifications with bounded duplicate suppression
+- Searchable inbox with category, source, date, favorite, warning, and sort filters
+- Swipe delete with Undo, bulk delete, bulk collection assignment, scoped history clearing, and retention controls
+- Offline deterministic categorization and suspicious-link heuristics
+- User collections and editable domain automation rules
+- Conservative URL tracking cleanup
+- Optional direct-to-website rich previews with strict time, redirect, response-size, and memory limits
+- Local seven-day insights by category, domain, and source app
+- Extensible Claude-inspired System, Light, and Dark themes
+- Privacy disclosure, source-app exclusions, and local-only database/settings backup rules
 
-## Features
+EasyLink contains no ads, analytics, accounts, AI API, or first-party server integration.
 
-- **Instant link detection** — monitors notifications from any app (SMS, WhatsApp, Telegram, email, etc.) and extracts URLs automatically
-- **One-tap actions** — actionable notification with Copy and Open buttons, no app switch required
-- **Security scanning** — flags suspicious URLs (IP-based links, lookalike domains, known-bad TLDs) before you tap
-- **Tracking strip** — removes tracking query parameters from Instagram and Twitter/X links automatically
-- **Privacy first** — zero network calls, zero data collection, 100% on-device processing
-- **Share sheet support** — share any link from any app to EasyLink to copy/open it
+## Architecture
 
----
+The project intentionally stays in one Android module. A small manual `AppContainer` owns replaceable repository, settings, ingestion, and metadata boundaries. Room provides transactional storage; ViewModels expose bounded Flow queries; Compose implements the feature UI.
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Language | Kotlin |
-| UI | Jetpack Compose + Material 3 |
-| Architecture | Single-module (`app/`), service + broadcast pattern |
-| Build | Gradle Kotlin DSL + Version Catalog |
-| Min SDK | 28 (Android 9) |
-| Target SDK | 36 |
-
----
-
-## Project Structure
-
-```
-app/src/main/java/com/iv/easylink/
-├── ui/
-│   └── MainActivity.kt          # Onboarding screen + EasyLink theme
-├── service/
-│   └── LinkNotificationListener.kt  # Core: NotificationListenerService
-├── actions/
-│   └── LinkActionReceiver.kt    # Handles Copy / Open broadcast actions
-├── share/
-│   └── ShareReceiverActivity.kt # Share-intent entry point
-└── utils/
-    ├── LinkExtractor.kt         # URL detection & normalization
-    └── SecurityScanner.kt       # Suspicious URL heuristics
+```text
+Notification / share / manual entry
+              │
+              ▼
+         LinkIngestor
+extract → normalize → clean → scan → categorize → rules
+              │
+              ▼
+        Room repository
+              │
+              ▼
+      ViewModels → Compose UI
 ```
 
----
+There is deliberately no DI framework, networking framework, WebView, analytics SDK, or background-work dependency.
 
-## How It Works
+## Build
 
-```
-Incoming notification (any app)
-        │
-        ▼
-LinkNotificationListener
-        │  extracts URLs via LinkExtractor
-        │  scans via SecurityScanner
-        ▼
-Actionable notification posted
-        │
-   ┌────┴────┐
-   ▼         ▼
- Copy      Open
-   │         │
-clipboard  browser
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-- Android Studio (latest stable, via JetBrains Toolbox recommended)
-- Android SDK 36
-- A device or emulator running Android 9+
-
-### Build & Run
+Prerequisites: Java 11+, Android SDK 36, and an Android 9+ device or emulator.
 
 ```bash
-# Debug APK
-./gradlew assembleDebug
-
-# Install directly to connected device
-./gradlew installDebug
-
-# Run unit tests
-./gradlew test
+./gradlew testDebugUnitTest assembleDebug
+./gradlew lintRelease assembleRelease bundleRelease
+./gradlew connectedDebugAndroidTest
 ```
 
-### Permissions Required
+The debug APK is generated under `app/build/outputs/apk/debug/`. The shrunk release APK and Play Store AAB are under `app/build/outputs/apk/release/` and `app/build/outputs/bundle/release/`.
 
-| Permission | Why |
-|---|---|
-| `BIND_NOTIFICATION_LISTENER_SERVICE` | Read incoming notifications to detect links |
-| `POST_NOTIFICATIONS` | Show the copy/open action notification (Android 13+) |
+## Privacy and release preparation
 
-The app walks the user through granting both on first launch.
+- The in-app website, privacy, terms, and support values in `AppLinks.kt` are placeholders.
+- Publish and finalize [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) before store submission.
+- Follow [`docs/PLAY_STORE_RELEASE_CHECKLIST.md`](docs/PLAY_STORE_RELEASE_CHECKLIST.md).
+- Rich previews make direct requests to destination websites and can be disabled in Settings.
+- Notification message bodies and sender/contact names are not persisted.
 
----
-
-## Design
-
-EasyLink uses an editorial design language — a **blush pearl canvas** paired with a **mulberry accent** (`#8B1E41`). The visual identity is intentionally warm and reading-focused, avoiding the harsh blues and neons common in utility apps.
-
-Key design tokens:
-
-| Token | Value | Use |
-|---|---|---|
-| Canvas | `#FCFAFB` | Page background |
-| Mulberry | `#8B1E41` | Primary CTAs, active states |
-| Ink | `#1A1517` | Headlines and primary text |
-| Body | `#4A4045` | Running text |
-| Surface Card | `#F5EFF2` | Card backgrounds |
-
-Full design spec in [`DESIGN.md`](./DESIGN.md).
-
----
-
-## Roadmap
-
-- [ ] Phase 2 — Link history / saved links list
-- [ ] Phase 2 — Bundled Lora + Inter custom fonts
-- [ ] Phase 2 — Dark mode (aubergine surface `#1A1316`)
-- [ ] Phase 3 — AI-powered link summaries
-- [ ] Phase 3 — Collections and tagging
-
----
-
-## Logs & Debugging
+## Debugging
 
 ```bash
 adb logcat -s EasyLink
 ```
 
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE) for details.
+See [`DESIGN.md`](DESIGN.md) and [`ROADMAP.md`](ROADMAP.md) for the product and visual source material.

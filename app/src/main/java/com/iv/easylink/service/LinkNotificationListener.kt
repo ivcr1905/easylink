@@ -1,26 +1,18 @@
 package com.iv.easylink.service
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.iv.easylink.actions.LinkActionReceiver
-import com.iv.easylink.utils.LinkExtractor
-import androidx.core.net.toUri
-import com.iv.easylink.R
-import androidx.core.graphics.drawable.toBitmap
-import android.graphics.Bitmap
 import com.iv.easylink.EasyLinkApplication
-import com.iv.easylink.data.repository.LinkRepository
-import com.iv.easylink.utils.SecurityScanner.isSuspiciousUrl
+import com.iv.easylink.R
+import com.iv.easylink.actions.LinkActionReceiver
+import com.iv.easylink.ingestion.LinkSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -28,153 +20,119 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class LinkNotificationListener : NotificationListenerService() {
-    private var lastProcessedKey: String? = null
-    private var lastProcessedUrl: String? = null
-
-    /** Coroutine scope tied to the service lifecycle for DB writes. */
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    /** Repository obtained from the Application singleton. */
-    private lateinit var linkRepository: LinkRepository
-
-    companion object {
-        private const val CHANNEL_ID = "easyLink_detected_links"
-    }
+    private val recentEvents = ArrayDeque<Int>(MAX_RECENT_EVENTS)
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        linkRepository = (application as EasyLinkApplication).linkRepository
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         serviceScope.cancel()
+        super.onDestroy()
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        super.onNotificationPosted(sbn)
         try {
-            if(sbn==null){
-                return
-            }
-            if(sbn.packageName == applicationContext.packageName || sbn.isOngoing) {
-                return
-            }
-            val notificationCategory = sbn.notification?.category
-            val categoryList = listOf(
-                NotificationCompat.CATEGORY_MESSAGE,
-                NotificationCompat.CATEGORY_SOCIAL,
-                NotificationCompat.CATEGORY_EMAIL)
-            if (notificationCategory != null && !categoryList.contains(notificationCategory)){
-                return
-            }
-            var textToParse: String?
-            val messagingStyle = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(sbn.notification)
-            if (messagingStyle != null) {
-                textToParse = messagingStyle.messages.lastOrNull()?.text?.toString()
-            } else {
-                // The fallback for basic SMS apps
-                textToParse = sbn.notification.extras.getCharSequence(NotificationCompat.EXTRA_TEXT)?.toString()
-            }
-            val extractedLinks = LinkExtractor.extractLinks(textToParse)
-            if (extractedLinks.isEmpty()) {
-                return
-            }
-            val primaryLink = extractedLinks[0]
-            if (sbn.key == lastProcessedKey && primaryLink == lastProcessedUrl) return
-            lastProcessedKey = sbn.key
-            lastProcessedUrl = primaryLink
-            val isSuspicious = isSuspiciousUrl(primaryLink)
-            val pm = applicationContext.packageManager
-            val extras = sbn.notification.extras
-            val senderName = extras.getCharSequence(NotificationCompat.EXTRA_TITLE)?.toString() ?: "Unknown Sender"
-            var appName = "Unknown App"
-            var appIconBitmap : Bitmap? = null
-            try {
-                appName = pm.getApplicationLabel(pm.getApplicationInfo(sbn.packageName, 0)).toString()
-                // Fetch the actual app icon (like the WhatsApp logo) and convert it to a Bitmap
-                appIconBitmap = pm.getApplicationIcon(sbn.packageName).toBitmap()
-            } catch (e: Exception) {
-                // Failsafe in case the app icon can't be found
-            }
-
-            // ── Phase 2: persist the link to the local database ──────────────
-            serviceScope.launch {
-                try {
-                    linkRepository.saveLink(
-                        url = primaryLink,
-                        sourceApp = appName,
-                        senderName = senderName,
-                        isSuspicious = isSuspicious,
-                    )
-                } catch (e: Exception) {
-                    Log.e("EasyLink", "Failed to save link to database", e)
-                }
-            }
-
-            showLinkNotification(primaryLink, isSuspicious, senderName, appName, appIconBitmap)
-        } catch (e : Exception){
-            Log.e("EasyLink", "Failed to process notification safely", e)
+            handleNotification(sbn)
+        } catch (error: Exception) {
+            Log.e(LOG_TAG, "Unexpected notification format", error)
         }
     }
 
-    private fun showLinkNotification(url : String, isSuspicious : Boolean, senderName : String, appName: String, appIcon: Bitmap?) {
-        val browserIntent = Intent(Intent.ACTION_VIEW, url.toUri())
-        val openPendingIntent = PendingIntent.getActivity(this,
-            url.hashCode(),
-            browserIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-        val copyIntent = Intent(this, LinkActionReceiver::class.java).apply {
-            action = "ACTION_COPY_LINK"
-            putExtra("EXTRA_URL", url)
+    private fun handleNotification(sbn: StatusBarNotification?) {
+        if (sbn == null || sbn.packageName == packageName || sbn.isOngoing) return
+        val app = application as EasyLinkApplication
+        if (sbn.packageName in app.container.settings.state.value.ignoredPackages) return
+        val notification = sbn.notification ?: return
+        val category = notification.category
+        if (category != null && category !in ACCEPTED_CATEGORIES) return
+        val text = latestNotificationText(notification) ?: return
+        val fingerprint = 31 * sbn.key.hashCode() + text.hashCode()
+        synchronized(recentEvents) {
+            if (fingerprint in recentEvents) return
+            if (recentEvents.size == MAX_RECENT_EVENTS) recentEvents.removeFirst()
+            recentEvents.addLast(fingerprint)
         }
-        val copyPendingIntent = PendingIntent.getBroadcast(
-            this,
-            url.hashCode()+1,
-            copyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val sourceName = runCatching {
+            packageManager.getApplicationLabel(packageManager.getApplicationInfo(sbn.packageName, 0)).toString()
+        }.getOrDefault(getString(R.string.unknown_app))
+        val sender = notification.extras.getCharSequence(NotificationCompat.EXTRA_TITLE)?.toString()?.take(80)
 
-        val builder = NotificationCompat.Builder(this,CHANNEL_ID )
+        serviceScope.launch {
+            runCatching {
+                app.container.linkIngestor.ingest(text, LinkSource(sbn.packageName, sourceName))
+            }.onSuccess { links ->
+                if (links.isNotEmpty()) showDetectedNotification(links.first().url, links.first().suspicious, links.size, sender, sourceName)
+            }.onFailure { error ->
+                Log.e(LOG_TAG, "Could not process notification", error)
+            }
+        }
+    }
+
+    private fun latestNotificationText(notification: android.app.Notification): CharSequence? {
+        val style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(notification)
+        style?.messages?.lastOrNull()?.text?.takeIf { it.isNotBlank() }?.let { return it }
+        val extras = notification.extras
+        return extras.getCharSequence(NotificationCompat.EXTRA_BIG_TEXT)?.takeIf { it.isNotBlank() }
+            ?: extras.getCharSequence(NotificationCompat.EXTRA_TEXT)?.takeIf { it.isNotBlank() }
+            ?: extras.getCharSequenceArray(NotificationCompat.EXTRA_TEXT_LINES)?.lastOrNull()?.takeIf { it.isNotBlank() }
+    }
+
+    private fun showDetectedNotification(url: String, suspicious: Boolean, count: Int, sender: String?, sourceName: String) {
+        val openIntent = actionIntent(LinkActionReceiver.ACTION_OPEN_LINK, url, url.hashCode())
+        val copyIntent = actionIntent(LinkActionReceiver.ACTION_COPY_LINK, url, url.hashCode() + 1)
+        val title = when {
+            suspicious -> getString(R.string.suspicious_link_title)
+            !sender.isNullOrBlank() -> sender
+            else -> getString(R.string.link_detected)
+        }
+        val body = if (count > 1) resources.getQuantityString(R.plurals.links_detected, count, count) else url
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_bolt)
-            .setSubText(appName)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSubText(sourceName)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-        if(isSuspicious){
-            builder.setContentTitle("⚠️ $senderName sent a Link that may be unsafe")
-            builder.setContentText("This link may be unsafe. Proceed with caution.")
-            builder.addAction(R.drawable.ic_action_copy, "Copy Link", copyPendingIntent)
-        } else {
-            builder.setContentTitle(senderName)
-            builder.setContentText(url)
-            builder.setContentIntent(openPendingIntent)
-            builder.addAction(R.drawable.ic_action_open,"Open",openPendingIntent)
-            builder.addAction(R.drawable.ic_action_copy,"Copy",copyPendingIntent)
+            .setOnlyAlertOnce(true)
+            .addAction(R.drawable.ic_action_copy, getString(R.string.copy), copyIntent)
+        if (!suspicious) {
+            builder.setContentIntent(openIntent)
+                .addAction(R.drawable.ic_action_open, getString(R.string.open), openIntent)
         }
-        if(appIcon != null) builder.setLargeIcon(appIcon)
-        val notificationManager = NotificationManagerCompat.from(this)
         try {
-            notificationManager.notify(url.hashCode(),builder.build())
-        } catch (e : SecurityException) {
-            Log.e("EasyLink", "Failed to show notification", e)
+            NotificationManagerCompat.from(this).notify(url.hashCode(), builder.build())
+        } catch (error: SecurityException) {
+            Log.w(LOG_TAG, "Notification permission is unavailable", error)
         }
+    }
+
+    private fun actionIntent(action: String, url: String, requestCode: Int): PendingIntent {
+        val intent = Intent(this, LinkActionReceiver::class.java).apply {
+            this.action = action
+            putExtra(LinkActionReceiver.EXTRA_URL, url)
+        }
+        return PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Detected Links"
-            val descriptionText = "Shows actions for links found in your messages"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager: NotificationManager =
-                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(CHANNEL_ID, getString(R.string.channel_detected_links), NotificationManager.IMPORTANCE_HIGH).apply {
+            description = getString(R.string.channel_detected_links_description)
         }
+        getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
     }
 
-
+    private companion object {
+        const val LOG_TAG = "EasyLink"
+        const val CHANNEL_ID = "easyLink_detected_links"
+        const val MAX_RECENT_EVENTS = 64
+        val ACCEPTED_CATEGORIES = setOf(
+            NotificationCompat.CATEGORY_MESSAGE,
+            NotificationCompat.CATEGORY_SOCIAL,
+            NotificationCompat.CATEGORY_EMAIL,
+        )
+    }
 }

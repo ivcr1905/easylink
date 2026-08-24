@@ -1,28 +1,39 @@
 package com.iv.easylink.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * Room entity representing a saved link detected from notifications or shared via the share sheet.
- */
-@Entity(tableName = "links")
-data class LinkEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-
-    /** The cleaned, navigable URL. */
-    val url: String,
-
-    /** Display name of the source application (e.g. "WhatsApp", "Telegram"). */
-    val sourceApp: String,
-
-    /** Sender / contact name extracted from the notification title. */
-    val senderName: String,
-
-    /** Epoch millis when the link was detected. */
-    val timestamp: Long,
-
-    /** Whether the SecurityScanner flagged this URL as suspicious. */
-    val isSuspicious: Boolean,
+@Entity(
+    tableName = "links",
+    indices = [
+        Index(value = ["timestamp"]),
+        Index(value = ["url", "timestamp"]),
+        Index(value = ["host"]),
+        Index(value = ["category"]),
+        Index(value = ["sourcePackage"]),
+    ],
 )
+data class LinkEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val url: String,
+    val host: String,
+    val sourcePackage: String?,
+    val sourceApp: String,
+    val timestamp: Long,
+    val category: Int,
+    val isSuspicious: Boolean,
+    val isFavorite: Boolean = false,
+    val wasCleaned: Boolean = false,
+    val title: String? = null,
+    val siteName: String? = null,
+    val imageUrl: String? = null,
+    val metadataState: Int = METADATA_PENDING,
+    val metadataUpdatedAt: Long? = null,
+) {
+    companion object {
+        const val METADATA_PENDING = 0
+        const val METADATA_LOADED = 1
+        const val METADATA_UNAVAILABLE = 2
+    }
+}

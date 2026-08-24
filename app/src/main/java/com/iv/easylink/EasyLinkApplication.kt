@@ -1,20 +1,25 @@
 package com.iv.easylink
 
 import android.app.Application
-import com.iv.easylink.data.local.EasyLinkDatabase
-import com.iv.easylink.data.repository.LinkRepository
-import com.iv.easylink.data.repository.LinkRepositoryImpl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
-/**
- * Application-level singleton holder.
- * Lazily initialises the Room database and the [LinkRepository] so every component
- * (activities, services, ViewModels) can access them without manual context passing.
- */
 class EasyLinkApplication : Application() {
+    val container: AppContainer by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { DefaultAppContainer(this) }
+    val linkRepository get() = container.linkRepository
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    /** The Room database — created on first access. */
-    val database: EasyLinkDatabase by lazy { EasyLinkDatabase.getInstance(this) }
+    override fun onCreate() {
+        super.onCreate()
+        val retentionDays = container.settings.state.value.retentionDays
+        if (retentionDays > 0) {
+            applicationScope.launch {
+                container.linkRepository.clearOlderThan(System.currentTimeMillis() - retentionDays * MILLIS_PER_DAY)
+            }
+        }
+    }
 
-    /** App-wide link repository. */
-    val linkRepository: LinkRepository by lazy { LinkRepositoryImpl(database.linkDao()) }
+    private companion object { const val MILLIS_PER_DAY = 86_400_000L }
 }

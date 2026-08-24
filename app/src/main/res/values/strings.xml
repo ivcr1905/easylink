@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">EasyLink</string>
+    <string name="source_shared">Shared via Android</string>
+    <string name="unknown_app">Unknown app</string>
+    <string name="no_link_found">No new link found</string>
+    <string name="suspicious_link_title">Potentially unsafe link</string>
+    <string name="link_detected">Link detected</string>
+    <string name="copy">Copy</string>
+    <string name="open">Open</string>
+    <string name="channel_detected_links">Detected links</string>
+    <string name="channel_detected_links_description">Quick actions for links found in notifications</string>
+    <plurals name="links_saved"><item quantity="one">%d link saved</item><item quantity="other">%d links saved</item></plurals>
+    <plurals name="links_detected"><item quantity="one">%d link detected</item><item quantity="other">%d links detected and saved</item></plurals>
 </resources>

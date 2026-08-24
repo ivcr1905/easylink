@@ -1,28 +1,34 @@
 package com.iv.easylink.utils
 
-import androidx.core.net.toUri
-import java.util.Locale.getDefault
+import java.net.IDN
+import java.net.URI
+import java.util.Locale
 
 object SecurityScanner {
+    private val ipv4Pattern = Regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$")
+    private val suspiciousTlds = setOf("tk", "ml", "cf", "gq", "ga", "top")
+    private val suspiciousKeywords = arrayOf("login", "secure", "billing", "verify", "account", "support", "auth")
+    private val protectedBrands = arrayOf("netflix", "amazon", "paypal", "microsoft", "apple", "google")
+
     fun isSuspiciousUrl(url: String): Boolean {
         return try {
-            val uri = url.toUri()
-            val host = uri.host?.lowercase(getDefault()) ?: return false
-            val ipRegex = "^([0-9]{1,3}\\.){3}[0-9]{1,3}$".toRegex()
-            if (host.matches(ipRegex)) return true
-            val suspiciousList = listOf(".tk", ".ml", ".cf", ".gq", ".xyz",".ga",".top")
-            if (suspiciousList.any { host.endsWith(it) }) return true
-            val suspiciousKeywordsList = listOf("login", "secure", "billing", "verify", "account","support","auth")
-            if (host.contains("-") && suspiciousKeywordsList.any { host.contains(it) }) return true
-            val trustedBrands = listOf("netflix", "amazon", "paypal", "microsoft","apple","google","bank")
-            val parts = host.split(".")
-            if (parts.size > 2) {
-                val subdomain = parts.dropLast(2).joinToString(".")
-                if (trustedBrands.any { (subdomain.contains(it)) }) return true
+            val host = URI(url).host?.lowercase(Locale.ROOT) ?: return true
+            if (host == "localhost" || ipv4Pattern.matches(host) || host.contains(':')) return true
+            if (host.substringAfterLast('.') in suspiciousTlds) return true
+            if (host.startsWith("xn--") || host.contains(".xn--")) {
+                val unicode = IDN.toUnicode(host).lowercase(Locale.ROOT)
+                if (protectedBrands.any(unicode::contains)) return true
             }
-            return false
-        } catch (e: Exception) {
+            if ('-' in host && suspiciousKeywords.any(host::contains)) return true
+            val labels = host.split('.')
+            if (labels.size > 2) {
+                val registrableApproximation = labels.takeLast(2).joinToString(".")
+                val subdomain = labels.dropLast(2).joinToString(".")
+                if (protectedBrands.any { it in subdomain && !registrableApproximation.startsWith("$it.") }) return true
+            }
             false
+        } catch (_: Exception) {
+            true
         }
     }
 }
