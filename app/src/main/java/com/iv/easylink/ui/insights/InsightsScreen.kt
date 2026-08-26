@@ -1,86 +1,138 @@
 package com.iv.easylink.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.iv.easylink.data.local.CountByKey
 import com.iv.easylink.model.LinkCategory
+import com.iv.easylink.ui.theme.EasyLinkDimensions
 import com.iv.easylink.ui.theme.EasyLinkTheme
+import com.iv.easylink.ui.components.EasyLinkIcons
 
 @Composable
-fun InsightsScreen(viewModel: EasyLinkViewModel) {
+fun InsightsScreen(
+    viewModel: EasyLinkViewModel,
+    onReviewFavorites: () -> Unit,
+    onReviewWarnings: () -> Unit,
+    onOpenCategory: (Int) -> Unit,
+) {
     val total by viewModel.weekTotal.collectAsState()
     val categories by viewModel.categoryCounts.collectAsState()
     val domains by viewModel.topDomains.collectAsState()
     val sources by viewModel.topSources.collectAsState()
     val favorites by viewModel.favoriteCount.collectAsState()
     val suspicious by viewModel.suspiciousCount.collectAsState()
+    val leadingCategory = categories.firstOrNull()
+    val leadingSource = sources.firstOrNull()
+
     LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(horizontal = EasyLinkDimensions.screenPadding, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(EasyLinkDimensions.sectionSpacing),
     ) {
         item {
-            Text("Your week in links", style = MaterialTheme.typography.headlineLarge)
-            Text("Computed privately from your on-device inbox.", color = EasyLinkTheme.extraColors.mutedText)
-        }
-        item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MetricCard(total.toString(), "Last 7 days", Modifier.weight(1f), MaterialTheme.colorScheme.primary)
-                MetricCard(favorites.toString(), "Favorites", Modifier.weight(1f), EasyLinkTheme.extraColors.success)
-                MetricCard(suspicious.toString(), "Warnings", Modifier.weight(1f), MaterialTheme.colorScheme.error)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Your week in links", style = MaterialTheme.typography.headlineLarge)
+                Text(
+                    if (total == 0) "Your private weekly recap will appear as links arrive."
+                    else "$total link${if (total == 1) "" else "s"} saved in the last 7 days.",
+                    color = EasyLinkTheme.extraColors.mutedText,
+                )
             }
         }
-        item { InsightSection("Categories", categories.map { it.copy(key = LinkCategory.fromCode(it.key.toIntOrNull() ?: 0).label) }, EasyLinkTheme.extraColors.categoryColors) }
-        item { InsightSection("Top domains", domains, listOf(MaterialTheme.colorScheme.primary)) }
-        item { InsightSection("Source apps", sources, listOf(EasyLinkTheme.extraColors.success)) }
-        item { Text("Counts update as links are added or removed. EasyLink does not send insight data anywhere.", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText, modifier = Modifier.padding(vertical = 18.dp)) }
-    }
-}
-
-@Composable
-private fun MetricCard(value: String, label: String, modifier: Modifier, color: Color) {
-    Card(modifier, colors = CardDefaults.cardColors(containerColor = color.copy(alpha = .14f))) {
-        Column(Modifier.padding(14.dp)) {
-            Text(value, style = MaterialTheme.typography.headlineMedium, color = color)
-            Text(label, style = MaterialTheme.typography.bodySmall)
+        if (total > 0) {
+            item {
+                Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = .55f), shape = MaterialTheme.shapes.medium) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                        Text("This week's pattern", style = MaterialTheme.typography.titleMedium)
+                        leadingCategory?.let {
+                            Text("You saved mostly ${LinkCategory.fromCode(it.key.toIntOrNull() ?: 0).label.lowercase()} links.")
+                        }
+                        leadingSource?.let { Text("${it.key} was your most active source.") }
+                    }
+                }
+            }
+        }
+        if (favorites > 0 || suspicious > 0) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Review", style = MaterialTheme.typography.titleLarge)
+                    Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium) {
+                        Column {
+                            if (favorites > 0) ActionRow(EasyLinkIcons.FavoriteBorder, "$favorites favorite${if (favorites == 1) "" else "s"}", "Open saved favorites", onReviewFavorites)
+                            if (favorites > 0 && suspicious > 0) HorizontalDivider()
+                            if (suspicious > 0) ActionRow(EasyLinkIcons.Warning, "$suspicious warning${if (suspicious == 1) "" else "s"}", "Review links flagged by local checks", onReviewWarnings)
+                        }
+                    }
+                }
+            }
+        }
+        if (categories.isNotEmpty()) {
+            item {
+                InsightList(
+                    title = "Top categories",
+                    rows = categories.take(4).map { it.copy(key = LinkCategory.fromCode(it.key.toIntOrNull() ?: 0).label) },
+                    onClick = { label -> LinkCategory.displayEntries.firstOrNull { it.label == label }?.let { onOpenCategory(it.code) } },
+                )
+            }
+        }
+        if (domains.isNotEmpty()) item { InsightList("Top domains", domains.take(5)) }
+        if (sources.isNotEmpty()) item { InsightList("Source apps", sources.take(5)) }
+        item {
+            Text(
+                "Computed on this device. EasyLink never uploads insight data.",
+                style = MaterialTheme.typography.bodySmall,
+                color = EasyLinkTheme.extraColors.mutedText,
+                modifier = Modifier.padding(bottom = 24.dp),
+            )
         }
     }
 }
 
 @Composable
-private fun InsightSection(title: String, rows: List<CountByKey>, colors: List<Color>) {
-    Card(colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(title, style = MaterialTheme.typography.titleLarge)
-            if (rows.isEmpty()) Text("No data yet", color = EasyLinkTheme.extraColors.mutedText)
-            val maximum = rows.maxOfOrNull { it.count }?.coerceAtLeast(1) ?: 1
-            rows.forEachIndexed { index, row ->
-                Column {
-                    Row(Modifier.fillMaxWidth()) {
-                        Text(row.key, modifier = Modifier.weight(1f), maxLines = 1)
-                        Text(row.count.toString(), color = EasyLinkTheme.extraColors.mutedText)
+private fun ActionRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+        Column(Modifier.padding(horizontal = 12.dp).weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText)
+        }
+        Icon(EasyLinkIcons.Chevron, null, tint = EasyLinkTheme.extraColors.mutedText)
+    }
+}
+
+@Composable
+private fun InsightList(title: String, rows: List<CountByKey>, onClick: ((String) -> Unit)? = null) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, style = MaterialTheme.typography.titleLarge)
+        Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium) {
+            Column {
+                rows.forEachIndexed { index, row ->
+                    Row(
+                        Modifier.fillMaxWidth().then(if (onClick == null) Modifier else Modifier.clickable { onClick(row.key) }).padding(horizontal = 14.dp, vertical = 11.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(row.key, Modifier.weight(1f), maxLines = 1)
+                        Text(row.count.toString(), style = MaterialTheme.typography.labelLarge, color = EasyLinkTheme.extraColors.mutedText)
+                        if (onClick != null) Icon(EasyLinkIcons.Chevron, null, Modifier.padding(start = 6.dp), tint = EasyLinkTheme.extraColors.mutedText)
                     }
-                    Box(Modifier.fillMaxWidth().padding(top = 5.dp).height(7.dp).background(MaterialTheme.colorScheme.outline.copy(alpha = .25f), MaterialTheme.shapes.extraSmall)) {
-                        val barColor = if (colors.isEmpty()) MaterialTheme.colorScheme.primary else colors[index % colors.size]
-                        Box(Modifier.fillMaxWidth(row.count.toFloat() / maximum).height(7.dp).background(barColor, MaterialTheme.shapes.extraSmall))
-                    }
+                    if (index != rows.lastIndex) HorizontalDivider()
                 }
             }
         }

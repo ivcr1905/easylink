@@ -3,7 +3,12 @@ package com.iv.easylink.utils
 import java.net.URI
 import java.util.Locale
 
-data class NormalizedLink(val url: String, val host: String, val wasCleaned: Boolean)
+data class NormalizedLink(
+    val url: String,
+    val host: String,
+    val wasCleaned: Boolean,
+    val originalUrl: String? = null,
+)
 
 object LinkExtractor {
     private val urlPattern = Regex(
@@ -27,7 +32,11 @@ object LinkExtractor {
         val normalized = normalize(rawUrl) ?: return null
         val cleaned = LinkCleaner.clean(normalized.url)
         val final = normalize(cleaned) ?: return normalized
-        return final.copy(wasCleaned = final.url != normalized.url)
+        val changed = final.url != normalized.url
+        return final.copy(
+            wasCleaned = changed,
+            originalUrl = normalized.url.takeIf { changed },
+        )
     }
 
     fun cleanTrackingUrl(dirtyUrl: String): String = process(dirtyUrl)?.url ?: dirtyUrl

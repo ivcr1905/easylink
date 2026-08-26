@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [LinkEntity::class, CollectionEntity::class, LinkCollectionEntity::class, AutomationRuleEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = true,
 )
 abstract class EasyLinkDatabase : RoomDatabase() {
@@ -42,11 +42,33 @@ abstract class EasyLinkDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE links ADD COLUMN senderName TEXT")
+                db.execSQL("ALTER TABLE links ADD COLUMN conversationName TEXT")
+                db.execSQL("ALTER TABLE links ADD COLUMN archivedAt INTEGER")
+                db.execSQL("ALTER TABLE links ADD COLUMN deletedAt INTEGER")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_links_archivedAt ON links(archivedAt)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_links_deletedAt ON links(deletedAt)")
+                db.execSQL("ALTER TABLE collections ADD COLUMN isPinned INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("UPDATE links SET category = 0 WHERE category = 8")
+                db.execSQL("UPDATE automation_rules SET category = 0 WHERE category = 8")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE links ADD COLUMN originalUrl TEXT")
+                db.execSQL("ALTER TABLE links ADD COLUMN isReadLater INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_links_isReadLater ON links(isReadLater)")
+            }
+        }
+
         @Volatile private var instance: EasyLinkDatabase? = null
 
         fun getInstance(context: Context): EasyLinkDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, EasyLinkDatabase::class.java, DATABASE_NAME)
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .build()
                 .also { instance = it }
         }

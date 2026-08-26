@@ -9,4 +9,5 @@ data class CollectionEntity(
     val name: String,
     val colorToken: Int,
     val createdAt: Long,
+    val isPinned: Boolean = false,
 )

@@ -30,6 +30,14 @@ class LinkProcessingTest {
     }
 
     @Test
+    fun `processing retains the normalized original when cleaning changes a link`() {
+        val processed = LinkExtractor.process("example.com/article?utm_source=chat")!!
+        assertEquals("https://example.com/article", processed.url)
+        assertEquals("https://example.com/article?utm_source=chat", processed.originalUrl)
+        assertTrue(processed.wasCleaned)
+    }
+
+    @Test
     fun `cleaner uses hostname boundaries`() {
         val cleaned = LinkCleaner.clean("https://attackerx.com/path?s=required")
         assertEquals("https://attackerx.com/path?s=required", cleaned)
@@ -70,8 +78,11 @@ class LinkProcessingTest {
     @Test
     fun `categorizer recognizes common destinations`() {
         assertEquals(LinkCategory.VIDEO, LinkCategorizer.categorize("youtu.be", "https://youtu.be/id"))
-        assertEquals(LinkCategory.DEVELOPMENT, LinkCategorizer.categorize("github.com", "https://github.com/openai"))
+        assertEquals(LinkCategory.OTHER, LinkCategorizer.categorize("github.com", "https://github.com/openai"))
         assertEquals(LinkCategory.DOCUMENT, LinkCategorizer.categorize("example.com", "https://example.com/file.pdf"))
+        assertEquals(LinkCategory.SHOPPING, LinkCategorizer.categorize("fkrt.cc", "https://fkrt.cc/hILNss1"))
+        assertEquals(LinkCategory.MUSIC, LinkCategorizer.categorize("music.youtube.com", "https://music.youtube.com/watch?v=id"))
+        assertEquals(LinkCategory.OTHER, LinkCategorizer.categorize("unknown.example.com", "https://unknown.example.com/item"))
     }
 
     @Test

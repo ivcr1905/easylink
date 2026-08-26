@@ -10,7 +10,12 @@ import com.iv.easylink.utils.SecurityScanner
 import java.net.URI
 import java.util.Locale
 
-data class LinkSource(val packageName: String?, val appName: String)
+data class LinkSource(
+    val packageName: String?,
+    val appName: String,
+    val senderName: String? = null,
+    val conversationName: String? = null,
+)
 
 data class IngestedLink(
     val id: Long,
@@ -20,6 +25,7 @@ data class IngestedLink(
 
 data class PreparedLink(
     val url: String,
+    val originalUrl: String?,
     val host: String,
     val category: Int,
     val suspicious: Boolean,
@@ -36,6 +42,7 @@ class LinkIngestor(private val repository: LinkRepository) {
             prepared.add(
                 PreparedLink(
                     url = processed.url,
+                    originalUrl = processed.originalUrl,
                     host = processed.host,
                     category = LinkCategorizer.categorize(processed.host, processed.url).code,
                     suspicious = SecurityScanner.isSuspiciousUrl(processed.url),
@@ -62,15 +69,33 @@ class LinkIngestor(private val repository: LinkRepository) {
                     host = processed.host,
                     sourcePackage = source.packageName,
                     sourceApp = source.appName.take(80),
+                    senderName = source.senderName?.trim()?.take(80)?.ifBlank { null },
+                    conversationName = source.conversationName?.trim()?.take(80)?.ifBlank { null },
                     category = category,
                     isSuspicious = processed.suspicious,
                     wasCleaned = processed.wasCleaned,
+                    originalUrl = processed.originalUrl,
                 ),
             ) ?: return@forEach
             rule?.collectionId?.let { repository.addToCollection(id, it) }
             saved.add(IngestedLink(id, processed.url, processed.suspicious))
         }
         return saved
+    }
+
+    suspend fun ingestPreparedToCollection(
+        prepared: List<PreparedLink>,
+        source: LinkSource,
+        collectionId: Long,
+    ): Int {
+        ingestPrepared(prepared, source)
+        var added = 0
+        prepared.forEach { link ->
+            val id = repository.findRecentLink(link.url, source.appName) ?: return@forEach
+            repository.addToCollection(id, collectionId)
+            added++
+        }
+        return added
     }
 
     private fun AutomationRuleEntity.matches(host: String, url: String): Boolean {

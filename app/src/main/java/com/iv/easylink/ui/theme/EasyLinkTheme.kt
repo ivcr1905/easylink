@@ -76,8 +76,8 @@ object ClaudeThemeStyle : ThemeStyle {
         extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
         small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
         medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-        large = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
+        large = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
     )
     override val extras = EasyLinkExtraColors(
         card = CreamCard, softSurface = Color(0xFFF6F1E9), mutedText = Color(0xFF6D6962),
@@ -95,6 +95,13 @@ val LocalEasyLinkColors = staticCompositionLocalOf { ClaudeThemeStyle.extras }
 
 object EasyLinkTheme {
     val extraColors: EasyLinkExtraColors @Composable get() = LocalEasyLinkColors.current
+}
+
+/** Shared geometry keeps new screens visually compatible without duplicating magic values. */
+object EasyLinkDimensions {
+    val screenPadding = 16.dp
+    val sectionSpacing = 24.dp
+    val itemSpacing = 8.dp
 }
 
 @Composable
