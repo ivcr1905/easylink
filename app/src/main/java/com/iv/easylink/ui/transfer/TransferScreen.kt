@@ -2,12 +2,15 @@ package com.iv.easylink.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -49,23 +52,39 @@ fun TransferScreen(viewModel: EasyLinkViewModel) {
     Column(Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("Move your library safely", style = MaterialTheme.typography.headlineLarge)
         Text("Backups stay under your control and are never uploaded by EasyLink.", color = EasyLinkTheme.extraColors.mutedText)
-        Card(colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card)) {
+        Card(
+            shape = MaterialTheme.shapes.medium,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        ) {
             Column(Modifier.fillMaxWidth().padding(18.dp)) {
                 Text("Export everything", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(4.dp))
                 Text("Links, collections, favorites, archive, Bin, sender labels, and automation rules.", color = EasyLinkTheme.extraColors.mutedText)
                 Spacer(Modifier.height(14.dp))
-                Button(onClick = { export.launch("easylink-backup-${LocalDate.now()}${BackupCodec.FILE_SUFFIX}") }) {
-                    Icon(EasyLinkIcons.Export, null); Text("  Choose backup location")
+                Button(
+                    onClick = { export.launch("easylink-backup-${LocalDate.now()}${BackupCodec.FILE_SUFFIX}") },
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Icon(EasyLinkIcons.Export, null); Spacer(Modifier.width(8.dp)); Text("Choose backup location")
                 }
             }
         }
-        Card(colors = CardDefaults.cardColors(containerColor = EasyLinkTheme.extraColors.card)) {
+        Card(
+            shape = MaterialTheme.shapes.medium,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        ) {
             Column(Modifier.fillMaxWidth().padding(18.dp)) {
                 Text("Import an EasyLink file", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(4.dp))
                 Text("The complete file is validated before anything is changed.", color = EasyLinkTheme.extraColors.mutedText)
                 Spacer(Modifier.height(14.dp))
-                Button(onClick = { import.launch(arrayOf(BackupCodec.MIME_TYPE, "application/octet-stream")) }) {
-                    Icon(EasyLinkIcons.Import, null); Text("  Choose file")
+                Button(
+                    onClick = { import.launch(arrayOf(BackupCodec.MIME_TYPE, "application/octet-stream")) },
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Icon(EasyLinkIcons.Import, null); Spacer(Modifier.width(8.dp)); Text("Choose file")
                 }
             }
         }

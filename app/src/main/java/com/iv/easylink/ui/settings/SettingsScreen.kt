@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -199,21 +202,27 @@ fun SettingsScreen(viewModel: EasyLinkViewModel) {
 
 @Composable
 internal fun AppearanceSelector(selected: AppearanceMode, onSelect: (AppearanceMode) -> Unit) {
-    Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium) {
-        Row(Modifier.fillMaxWidth().padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+    ) {
+        Row(Modifier.fillMaxWidth().padding(3.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             AppearanceMode.entries.forEach { mode ->
                 val active = selected == mode
                 Surface(
                     modifier = Modifier.weight(1f).clickable { onSelect(mode) },
-                    shape = MaterialTheme.shapes.small,
-                    color = if (active) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                    contentColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                    shape = RoundedCornerShape(7.dp),
+                    color = if (active) MaterialTheme.colorScheme.surface else Color.Transparent,
+                    border = if (active) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
+                    contentColor = if (active) MaterialTheme.colorScheme.onSurface else EasyLinkTheme.extraColors.mutedText,
                 ) {
                     Text(
                         mode.name.lowercase().replaceFirstChar(Char::uppercase),
-                        modifier = Modifier.padding(vertical = 9.dp),
+                        modifier = Modifier.padding(vertical = 8.dp),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
                     )
                 }
             }
@@ -223,7 +232,12 @@ internal fun AppearanceSelector(selected: AppearanceMode, onSelect: (AppearanceM
 
 @Composable
 internal fun SettingsGroup(content: @Composable () -> Unit) {
-    Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Column { content() }
     }
 }

@@ -6,12 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,8 +65,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.verticalScroll
 import androidx.core.net.toUri
 import com.iv.easylink.data.local.CollectionSummary
@@ -113,8 +119,10 @@ fun InboxScreen(
             if (query.location == LinkLocation.ACTIVE) FloatingActionButton(
                 onClick = { showAdd = true },
                 modifier = Modifier.size(52.dp),
-                shape = MaterialTheme.shapes.large,
-            ) { Icon(EasyLinkIcons.Add, "Add link") }
+                shape = RoundedCornerShape(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) { Icon(EasyLinkIcons.Add, "Add link", modifier = Modifier.size(22.dp)) }
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
@@ -186,7 +194,14 @@ fun InboxScreen(
                         val label = dateLabel(link.timestamp)
                         val previousTimestamp = links.getOrNull(index - 1)?.timestamp
                         if (previousTimestamp == null || dateLabel(previousTimestamp) != label) {
-                            Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 8.dp, bottom = 2.dp))
+                            Text(
+                                text = label.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                letterSpacing = 0.5.sp,
+                                color = EasyLinkTheme.extraColors.mutedText,
+                                modifier = Modifier.padding(start = 4.dp, top = 16.dp, bottom = 6.dp),
+                            )
                         }
                         LinkSwipeCard(
                             link = link,
@@ -317,32 +332,30 @@ private fun InboxShortcutBar(
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = EasyLinkDimensions.screenPadding),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(horizontal = EasyLinkDimensions.screenPadding, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(shortcuts, key = InboxShortcut::storageKey) { shortcut ->
             val selected = shortcut.matches(query)
-            Column(
-                modifier = Modifier
-                    .combinedClickable(onClick = { onSelect(shortcut) }, onLongClick = onCustomize)
-                    .padding(top = 7.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                border = BorderStroke(
+                    1.dp,
+                    if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.35f) else MaterialTheme.colorScheme.outlineVariant,
+                ),
+                modifier = Modifier.combinedClickable(onClick = { onSelect(shortcut) }, onLongClick = onCustomize),
             ) {
                 Text(
-                    shortcut.label(collections),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (selected) MaterialTheme.colorScheme.primary else EasyLinkTheme.extraColors.mutedText,
-                )
-                Spacer(Modifier.height(7.dp))
-                Box(
-                    Modifier.height(2.dp).width(28.dp).background(
-                        if (selected) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent,
-                    ),
+                    text = shortcut.label(collections),
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                    color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else EasyLinkTheme.extraColors.mutedText,
                 )
             }
         }
     }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .35f))
 }
 
 private fun InboxShortcut.label(collections: List<CollectionSummary>): String = when (type) {
@@ -405,26 +418,56 @@ private fun SelectionBar(
 
 @Composable
 private fun EmptyInbox(location: LinkLocation, filtered: Boolean, onReset: () -> Unit) {
-    Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(if (filtered) EasyLinkIcons.FilterOff else EasyLinkIcons.Inbox, null, Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = .5f))
-            Spacer(Modifier.height(16.dp))
+    Box(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 48.dp), contentAlignment = Alignment.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Surface(
+                modifier = Modifier.size(64.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        if (filtered) EasyLinkIcons.FilterOff else EasyLinkIcons.Inbox,
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            Spacer(Modifier.height(18.dp))
             val title = when {
-                filtered -> "Nothing matches"
+                filtered -> "No matches found"
                 location == LinkLocation.ARCHIVED -> "No archived links"
                 location == LinkLocation.BIN -> "Bin is empty"
-                else -> "Your link inbox is ready"
+                else -> "Inbox is clear"
             }
             val body = when {
-                filtered -> "Try another search or clear the filters."
-                location == LinkLocation.ARCHIVED -> "Swipe right on an inbox link to archive it."
-                location == LinkLocation.BIN -> "Deleted links stay here for 30 days."
-                else -> "Share a link to EasyLink or receive one in a notification."
+                filtered -> "Try adjusting your search terms or clearing active filters."
+                location == LinkLocation.ARCHIVED -> "Links archived from your inbox will appear here."
+                location == LinkLocation.BIN -> "Deleted links stay in Bin for 30 days before being purged."
+                else -> "Links captured from notifications or shared to EasyLink will arrive here silently."
             }
-            Text(title, style = MaterialTheme.typography.headlineMedium)
+            Text(
+                title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+            )
             Spacer(Modifier.height(8.dp))
-            Text(body, color = EasyLinkTheme.extraColors.mutedText)
-            if (filtered) TextButton(onClick = onReset) { Text("Reset filters") }
+            Text(
+                body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = EasyLinkTheme.extraColors.mutedText,
+                textAlign = TextAlign.Center,
+            )
+            if (filtered) {
+                Spacer(Modifier.height(14.dp))
+                TextButton(onClick = onReset) { Text("Reset filters") }
+            }
         }
     }
 }

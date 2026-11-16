@@ -1,5 +1,6 @@
 package com.iv.easylink.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,7 +74,11 @@ fun InsightsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Review", style = MaterialTheme.typography.titleLarge)
-                    Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.medium,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    ) {
                         Column {
                             if (favorites > 0) ActionRow(EasyLinkIcons.FavoriteBorder, "$favorites favorite${if (favorites == 1) "" else "s"}", "Open saved favorites", onReviewFavorites)
                             if (favorites > 0 && suspicious > 0) HorizontalDivider()
@@ -121,7 +126,11 @@ private fun ActionRow(icon: ImageVector, title: String, subtitle: String, onClic
 private fun InsightList(title: String, rows: List<CountByKey>, onClick: ((String) -> Unit)? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, style = MaterialTheme.typography.titleLarge)
-        Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = MaterialTheme.shapes.medium,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
             Column {
                 rows.forEachIndexed { index, row ->
                     Row(

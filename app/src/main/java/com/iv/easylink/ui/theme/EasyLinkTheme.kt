@@ -38,56 +38,102 @@ data class EasyLinkExtraColors(
     val categoryColors: List<Color>,
 )
 
-private val Coral = Color(0xFFCC785C)
-private val CoralDark = Color(0xFFE49A7D)
-private val Ink = Color(0xFF171613)
-private val Canvas = Color(0xFFFAF9F5)
-private val CreamCard = Color(0xFFF0EAE0)
-private val DarkCanvas = Color(0xFF151412)
-private val DarkCard = Color(0xFF24221F)
+private val Terracotta = Color(0xFFC35638)
+private val TerracottaDark = Color(0xFFE87A5D)
+private val Charcoal = Color(0xFF141413)
+private val Canvas = Color(0xFFFBFBFA)
+private val CardWhite = Color(0xFFFFFFFF)
+private val DarkCanvas = Color(0xFF0F0F10)
+private val DarkCard = Color(0xFF18181A)
+private val SoftSurfaceLight = Color(0xFFF3F3F1)
+private val SoftSurfaceDark = Color(0xFF222225)
 
 object ClaudeThemeStyle : ThemeStyle {
     override val id = "claude"
     override val lightColors = lightColorScheme(
-        primary = Coral, onPrimary = Color.White, primaryContainer = Color(0xFFF5DED4),
-        onPrimaryContainer = Color(0xFF542012), background = Canvas, onBackground = Ink,
-        surface = Canvas, onSurface = Ink, surfaceVariant = CreamCard,
-        onSurfaceVariant = Color(0xFF4C4943), outline = Color(0xFFD8D1C7), error = Color(0xFFB83C3C),
+        primary = Terracotta,
+        onPrimary = Color.White,
+        primaryContainer = Color(0xFFFBECE6),
+        onPrimaryContainer = Color(0xFF431608),
+        background = Canvas,
+        onBackground = Charcoal,
+        surface = CardWhite,
+        onSurface = Charcoal,
+        surfaceVariant = SoftSurfaceLight,
+        onSurfaceVariant = Color(0xFF52514D),
+        outline = Color(0xFFE2E2DF),
+        outlineVariant = Color(0xFFEAEAEA),
+        error = Color(0xFFBA2D2D),
     )
     override val darkColors = darkColorScheme(
-        primary = CoralDark, onPrimary = Color(0xFF3B150B), primaryContainer = Color(0xFF713A29),
-        onPrimaryContainer = Color(0xFFFFDBCD), background = DarkCanvas, onBackground = Color(0xFFF8F5EF),
-        surface = DarkCanvas, onSurface = Color(0xFFF8F5EF), surfaceVariant = DarkCard,
-        onSurfaceVariant = Color(0xFFCBC5BC), outline = Color(0xFF55514A), error = Color(0xFFFFB4AB),
+        primary = TerracottaDark,
+        onPrimary = Color(0xFF381409),
+        primaryContainer = Color(0xFF522315),
+        onPrimaryContainer = Color(0xFFFFDDD2),
+        background = DarkCanvas,
+        onBackground = Color(0xFFF3F3F2),
+        surface = DarkCard,
+        onSurface = Color(0xFFF3F3F2),
+        surfaceVariant = SoftSurfaceDark,
+        onSurfaceVariant = Color(0xFFA1A09A),
+        outline = Color(0xFF2E2E32),
+        outlineVariant = Color(0xFF252528),
+        error = Color(0xFFFFB4AB),
     )
     override val typography = Typography(
-        displayMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Normal, fontSize = 34.sp, lineHeight = 39.sp, letterSpacing = (-0.4).sp),
-        headlineLarge = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Normal, fontSize = 30.sp, lineHeight = 36.sp, letterSpacing = (-0.2).sp),
-        headlineMedium = TextStyle(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Normal, fontSize = 25.sp, lineHeight = 31.sp),
-        titleLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 26.sp),
-        titleMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 22.sp),
-        bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp),
-        bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 21.sp),
-        bodySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
-        labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 20.sp),
-        labelMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 17.sp),
+        displayMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 28.sp, lineHeight = 34.sp, letterSpacing = (-0.4).sp),
+        headlineLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 30.sp, letterSpacing = (-0.2).sp),
+        headlineMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 26.sp),
+        titleLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 23.sp),
+        titleMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, lineHeight = 20.sp),
+        bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 22.sp),
+        bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp),
+        bodySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp),
+        labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp),
+        labelMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp),
     )
     override val shapes = Shapes(
-        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
         small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
         medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
         large = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
     )
     override val extras = EasyLinkExtraColors(
-        card = CreamCard, softSurface = Color(0xFFF6F1E9), mutedText = Color(0xFF6D6962),
-        success = Color(0xFF397A4B), warning = Color(0xFFB7791F),
-        categoryColors = listOf(Coral, Color(0xFF657B9A), Color(0xFF7C6B9A), Color(0xFF477E73), Color(0xFFAA713A), Color(0xFF5C7488), Color(0xFF926675), Color(0xFF65714B), Color(0xFF6B6963)),
+        card = CardWhite,
+        softSurface = SoftSurfaceLight,
+        mutedText = Color(0xFF6B6A65),
+        success = Color(0xFF2E7D32),
+        warning = Color(0xFFB45309),
+        categoryColors = listOf(
+            Terracotta,
+            Color(0xFF4A6B82),
+            Color(0xFF6A5A82),
+            Color(0xFF3B7A6A),
+            Color(0xFF8C5E35),
+            Color(0xFF4E6375),
+            Color(0xFF7E5262),
+            Color(0xFF56663E),
+            Color(0xFF5A5852),
+        ),
     )
     override val darkExtras = EasyLinkExtraColors(
-        card = DarkCard, softSurface = Color(0xFF1C1B18), mutedText = Color(0xFFA8A29A),
-        success = Color(0xFF84D69A), warning = Color(0xFFFFC875),
-        categoryColors = listOf(CoralDark, Color(0xFF92ADD0), Color(0xFFB19BDC), Color(0xFF75B9A9), Color(0xFFDFA467), Color(0xFF91B2C9), Color(0xFFD297AA), Color(0xFFA8B781), Color(0xFFAAA69D)),
+        card = DarkCard,
+        softSurface = SoftSurfaceDark,
+        mutedText = Color(0xFF8E8D88),
+        success = Color(0xFF66BB6A),
+        warning = Color(0xFFFBBF24),
+        categoryColors = listOf(
+            TerracottaDark,
+            Color(0xFF8BA5BA),
+            Color(0xFFA597BA),
+            Color(0xFF70B3A2),
+            Color(0xFFC7986E),
+            Color(0xFF8E9FA9),
+            Color(0xFFB88E9E),
+            Color(0xFF9CA984),
+            Color(0xFF9E9B95),
+        ),
     )
 }
 

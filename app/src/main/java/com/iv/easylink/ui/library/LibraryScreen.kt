@@ -1,7 +1,9 @@
 package com.iv.easylink.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -199,15 +201,29 @@ private fun CategoryCard(
     var menu by remember(category) { mutableStateOf(false) }
     Surface(
         modifier = modifier.clickable { onOpenCategory(category.code) },
-        color = EasyLinkTheme.extraColors.softSurface,
+        color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Row(Modifier.fillMaxWidth().padding(start = 11.dp, top = 7.dp, bottom = 7.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(EasyLinkIcons.category(category), null, Modifier.size(20.dp), tint = categoryColor(category.code))
-            Text(category.label, Modifier.padding(start = 8.dp).weight(1f), style = MaterialTheme.typography.titleMedium)
-            Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = EasyLinkTheme.extraColors.mutedText)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(32.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = categoryColor(category.code).copy(alpha = 0.12f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(EasyLinkIcons.category(category), null, Modifier.size(16.dp), tint = categoryColor(category.code))
+                }
+            }
+            Text(category.label, Modifier.padding(start = 10.dp).weight(1f), style = MaterialTheme.typography.titleMedium)
+            Text(count.toString(), style = MaterialTheme.typography.labelMedium, color = EasyLinkTheme.extraColors.mutedText)
             Box {
-                IconButton(onClick = { menu = true }, modifier = Modifier.size(40.dp)) { Icon(EasyLinkIcons.More, "Category actions", Modifier.size(19.dp)) }
+                IconButton(onClick = { menu = true }, modifier = Modifier.size(36.dp)) { Icon(EasyLinkIcons.More, "Category actions", Modifier.size(18.dp)) }
                 DropdownMenu(menu, { menu = false }) {
                     DropdownMenuItem(
                         text = { Text(if (!canToggleInbox) "Inbox list limit reached" else if (shownInInbox) "Remove from Inbox" else "Show in Inbox") },
@@ -237,8 +253,17 @@ private fun SectionTitle(title: String, subtitle: String, modifier: Modifier = M
 
 @Composable
 private fun EmptyLibraryCard(title: String, body: String) {
-    Surface(color = EasyLinkTheme.extraColors.softSurface, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(14.dp)) { Text(title, style = MaterialTheme.typography.titleMedium); Text(body, color = EasyLinkTheme.extraColors.mutedText) }
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(4.dp))
+            Text(body, style = MaterialTheme.typography.bodyMedium, color = EasyLinkTheme.extraColors.mutedText)
+        }
     }
 }
 
@@ -254,10 +279,26 @@ private fun CollectionRow(
     onToggleInbox: (Boolean) -> Unit,
 ) {
     var menu by remember(collection.id) { mutableStateOf(false) }
-    Surface(Modifier.fillMaxWidth().clickable(onClick = onOpen), color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium) {
-        Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(Modifier.size(40.dp), shape = MaterialTheme.shapes.small, color = categoryColor(collection.colorToken).copy(alpha = .14f)) {
-                Box(contentAlignment = Alignment.Center) { Icon(EasyLinkIcons.Collection, null, Modifier.size(21.dp), tint = categoryColor(collection.colorToken)) }
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen),
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = categoryColor(collection.colorToken).copy(alpha = 0.12f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(EasyLinkIcons.Collection, null, Modifier.size(18.dp), tint = categoryColor(collection.colorToken))
+                }
             }
             Column(Modifier.padding(start = 12.dp).weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -267,7 +308,7 @@ private fun CollectionRow(
                 Text("${collection.linkCount} link${if (collection.linkCount == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText)
             }
             Box {
-                IconButton(onClick = { menu = true }) { Icon(EasyLinkIcons.MoreVertical, "Collection actions") }
+                IconButton(onClick = { menu = true }, modifier = Modifier.size(36.dp)) { Icon(EasyLinkIcons.MoreVertical, "Collection actions", Modifier.size(18.dp)) }
                 DropdownMenu(menu, { menu = false }) {
                     DropdownMenuItem(
                         { Text(if (!canToggleInbox) "Inbox list limit reached" else if (shownInInbox) "Remove from Inbox" else "Show in Inbox") },
@@ -281,6 +322,7 @@ private fun CollectionRow(
             }
         }
     }
+}
 }
 
 @Composable

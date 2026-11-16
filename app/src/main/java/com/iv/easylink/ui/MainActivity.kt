@@ -20,6 +20,7 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -493,12 +495,13 @@ private fun TopBarSearchField(value: String, onValueChange: (String) -> Unit) {
         keyboard?.show()
     }
     Surface(
-        modifier = Modifier.fillMaxWidth().height(44.dp),
-        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth().height(42.dp),
+        shape = RoundedCornerShape(10.dp),
         color = EasyLinkTheme.extraColors.softSurface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(Modifier.padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(EasyLinkIcons.Search, null, Modifier.size(19.dp), tint = EasyLinkTheme.extraColors.mutedText)
+            Icon(EasyLinkIcons.Search, null, Modifier.size(18.dp), tint = EasyLinkTheme.extraColors.mutedText)
             androidx.compose.foundation.text.BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -510,7 +513,7 @@ private fun TopBarSearchField(value: String, onValueChange: (String) -> Unit) {
                     field()
                 },
             )
-            if (value.isNotEmpty()) IconButton(onClick = { onValueChange("") }, Modifier.size(36.dp)) { Icon(EasyLinkIcons.Close, "Clear search", Modifier.size(18.dp)) }
+            if (value.isNotEmpty()) IconButton(onClick = { onValueChange("") }, Modifier.size(32.dp)) { Icon(EasyLinkIcons.Close, "Clear search", Modifier.size(16.dp)) }
         }
     }
 }
@@ -522,42 +525,72 @@ private fun OnboardingScreen(listenerEnabled: Boolean, onComplete: () -> Unit) {
     val openNotificationAccess = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { openNotificationAccess() }
     Column(
-        Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 32.dp),
+        Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 32.dp),
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(
-            Modifier.size(72.dp).background(MaterialTheme.colorScheme.primary, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) { Icon(EasyLinkIcons.Link, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(34.dp)) }
-        Spacer(Modifier.height(24.dp))
-        Text("Links, ready when you are.", style = MaterialTheme.typography.displayMedium)
-        Spacer(Modifier.height(12.dp))
+        Surface(
+            modifier = Modifier.size(64.dp),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primaryContainer,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    EasyLinkIcons.Link,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+        Text("Links, ready when you are", style = MaterialTheme.typography.headlineLarge)
+        Spacer(Modifier.height(10.dp))
         Text(
-            "EasyLink finds web links in incoming notifications, cleans common tracking parameters, and saves them into your private on-device inbox.",
+            "EasyLink captures links from incoming notifications, cleans tracking parameters, and organizes them silently on this device.",
             style = MaterialTheme.typography.bodyLarge,
             color = EasyLinkTheme.extraColors.mutedText,
         )
         Spacer(Modifier.height(24.dp))
-        Surface(color = EasyLinkTheme.extraColors.card, shape = MaterialTheme.shapes.large) {
+        Surface(
+            color = EasyLinkTheme.extraColors.card,
+            shape = MaterialTheme.shapes.large,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        ) {
             Row(Modifier.padding(18.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Icon(EasyLinkIcons.Privacy, null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    EasyLinkIcons.Privacy,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
                 Column(Modifier.weight(1f)) {
                     Text("Before you continue", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "Notification access allows EasyLink to read notification text from other apps. Processing happens on this device. EasyLink stores detected links, their source app, and a sender name when the messaging app provides one. Message bodies are not stored. Rich previews are off by default because enabling them contacts linked websites.",
+                        "Notification access allows EasyLink to read links from notifications. Processing stays entirely on this device. Message bodies are not stored, and no data leaves your phone.",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = EasyLinkTheme.extraColors.mutedText,
                     )
                 }
             }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(20.dp))
         Button(
             onClick = { disclosureAccepted = true },
             enabled = !disclosureAccepted,
-            colors = ButtonDefaults.buttonColors(containerColor = if (disclosureAccepted) EasyLinkTheme.extraColors.success else MaterialTheme.colorScheme.primary),
-            modifier = Modifier.fillMaxWidth(),
-        ) { Icon(if (disclosureAccepted) EasyLinkIcons.Check else EasyLinkIcons.Privacy, null); Text(if (disclosureAccepted) "  Disclosure accepted" else "  I understand") }
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (disclosureAccepted) EasyLinkTheme.extraColors.success else MaterialTheme.colorScheme.primary,
+            ),
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+        ) {
+            Icon(if (disclosureAccepted) EasyLinkIcons.Check else EasyLinkIcons.Privacy, null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(if (disclosureAccepted) "Disclosure accepted" else "I understand")
+        }
         Spacer(Modifier.height(10.dp))
         Button(
             onClick = {
@@ -570,11 +603,27 @@ private fun OnboardingScreen(listenerEnabled: Boolean, onComplete: () -> Unit) {
                 }
             },
             enabled = disclosureAccepted,
-            modifier = Modifier.fillMaxWidth(),
-        ) { Text(if (listenerEnabled) "Continue to EasyLink" else "Open notification access") }
-        TextButton(onClick = onComplete, enabled = disclosureAccepted, modifier = Modifier.fillMaxWidth()) { Text("Use share sheet and manual entry only") }
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+        ) {
+            Text(if (listenerEnabled) "Continue to EasyLink" else "Open notification access")
+        }
+        Spacer(Modifier.height(6.dp))
+        TextButton(
+            onClick = onComplete,
+            enabled = disclosureAccepted,
+            modifier = Modifier.fillMaxWidth().height(44.dp),
+        ) {
+            Text("Use share sheet and manual entry only")
+        }
         Spacer(Modifier.height(12.dp))
-        Text("You can revoke access or delete all saved data at any time in Settings.", style = MaterialTheme.typography.bodySmall, color = EasyLinkTheme.extraColors.mutedText, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(
+            "You can revoke access or delete all saved data at any time in Settings.",
+            style = MaterialTheme.typography.bodySmall,
+            color = EasyLinkTheme.extraColors.mutedText,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
