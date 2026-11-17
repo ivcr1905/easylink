@@ -323,7 +323,6 @@ private fun CollectionRow(
         }
     }
 }
-}
 
 @Composable
 private fun RuleRow(
