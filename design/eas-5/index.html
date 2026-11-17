@@ -93,7 +93,7 @@
       width: 12px;
       height: 12px;
       border-radius: 4px;
-      background: #0d9488;
+      background: #58509c;
     }
 
     .review-title {
@@ -144,9 +144,9 @@
     }
 
     .review-btn.active {
-      background: #0e7490;
+      background: #58509c;
       color: #ffffff;
-      border-color: #0e7490;
+      border-color: #58509c;
     }
 
     .review-screens-select {
@@ -183,21 +183,21 @@
       color: var(--p-text-primary);
     }
 
-    /* Light Phone Theme Tokens */
+    /* Light Phone Theme Tokens: Pale lavender neutral canvas, white/soft flat rows, muted violet/indigo accent */
     .phone-frame[data-phone-theme="light"] {
-      --p-bezel: #0f172a;
-      --p-canvas: #f8fafc;
+      --p-bezel: #161424;
+      --p-canvas: #f2f0f9;
       --p-surface: #ffffff;
-      --p-surface-subtle: #f1f5f9;
-      --p-border: #e2e8f0;
-      --p-border-strong: #cbd5e1;
-      --p-text-primary: #0f172a;
-      --p-text-muted: #475569;
-      --p-text-subtle: #64748b;
-      --p-accent: #0e7490;
-      --p-accent-dark: #155e75;
-      --p-accent-container: #e0f2fe;
-      --p-on-accent-container: #0c4a6e;
+      --p-surface-subtle: #eae7f6;
+      --p-border: #e3e0f0;
+      --p-border-strong: #cecadf;
+      --p-text-primary: #191627;
+      --p-text-muted: #545068;
+      --p-text-subtle: #797490;
+      --p-accent: #58509c;
+      --p-accent-dark: #443c82;
+      --p-accent-container: #ede9fe;
+      --p-on-accent-container: #2b2269;
       --p-on-accent: #ffffff;
       --p-success: #15803d;
       --p-success-bg: #dcfce7;
@@ -205,38 +205,50 @@
       --p-warning-bg: #fef3c7;
       --p-danger: #b91c1c;
       --p-danger-bg: #fee2e2;
-      --p-status-icon: #0f172a;
-      --p-card-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-      --p-sheet-backdrop: rgba(15, 23, 42, 0.45);
+      --p-status-icon: #191627;
+      --p-card-shadow: none;
+      --p-sheet-backdrop: rgba(25, 22, 39, 0.45);
       --p-menu-bg: #ffffff;
+      --avatar-bg-1: #ede9fe; --avatar-text-1: #5b21b6;
+      --avatar-bg-2: #e0e7ff; --avatar-text-2: #3730a3;
+      --avatar-bg-3: #e0f2fe; --avatar-text-3: #0369a1;
+      --avatar-bg-4: #dcfce7; --avatar-text-4: #15803d;
+      --avatar-bg-5: #fef3c7; --avatar-text-5: #b45309;
+      --avatar-bg-6: #fce7f3; --avatar-text-6: #be185d;
     }
 
-    /* Dark Phone Theme Tokens */
+    /* Dark Phone Theme Tokens: Complementary dark palette */
     .phone-frame[data-phone-theme="dark"] {
-      --p-bezel: #020617;
-      --p-canvas: #0f172a;
-      --p-surface: #1e293b;
-      --p-surface-subtle: #334155;
-      --p-border: #334155;
-      --p-border-strong: #475569;
-      --p-text-primary: #f8fafc;
-      --p-text-muted: #94a3b8;
-      --p-text-subtle: #64748b;
-      --p-accent: #2dd4bf;
-      --p-accent-dark: #14b8a6;
-      --p-accent-container: #134e4a;
-      --p-on-accent-container: #ccfbf1;
-      --p-on-accent: #042f2e;
+      --p-bezel: #09080e;
+      --p-canvas: #13111c;
+      --p-surface: #1c1a27;
+      --p-surface-subtle: #292639;
+      --p-border: #2c293d;
+      --p-border-strong: #413d59;
+      --p-text-primary: #f2f1f8;
+      --p-text-muted: #a6a2be;
+      --p-text-subtle: #7a7693;
+      --p-accent: #a399f3;
+      --p-accent-dark: #877ce3;
+      --p-accent-container: #332d59;
+      --p-on-accent-container: #edeafc;
+      --p-on-accent: #15112f;
       --p-success: #4ade80;
       --p-success-bg: #064e3b;
       --p-warning: #fbbf24;
       --p-warning-bg: #78350f;
       --p-danger: #f87171;
       --p-danger-bg: #7f1d1d;
-      --p-status-icon: #f8fafc;
-      --p-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-      --p-sheet-backdrop: rgba(2, 6, 23, 0.7);
-      --p-menu-bg: #1e293b;
+      --p-status-icon: #f2f1f8;
+      --p-card-shadow: none;
+      --p-sheet-backdrop: rgba(5, 4, 10, 0.7);
+      --p-menu-bg: #1c1a27;
+      --avatar-bg-1: #2e1065; --avatar-text-1: #c4b5fd;
+      --avatar-bg-2: #1e1b4b; --avatar-text-2: #a5b4fc;
+      --avatar-bg-3: #082f49; --avatar-text-3: #7dd3fc;
+      --avatar-bg-4: #052e16; --avatar-text-4: #86efac;
+      --avatar-bg-5: #451a03; --avatar-text-5: #fde68a;
+      --avatar-bg-6: #4c0519; --avatar-text-6: #fbcfe8;
     }
 
     /* Phone Status Bar */
@@ -273,100 +285,60 @@
       gap: 6px;
     }
 
-    /* App Top Bar */
+    /* App Top Bar: Persistent Search links capsule with hamburger */
     .app-top-bar {
-      height: 60px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 6px 8px 4px 8px;
       background: var(--p-canvas);
-      border-bottom: 1px solid var(--p-border);
       position: relative;
       z-index: 40;
       flex-shrink: 0;
     }
 
-    .top-bar-left {
+    .search-capsule {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex: 1;
-      min-width: 0;
+      width: 100%;
+      height: 48px;
+      background: var(--p-surface);
+      border: 1px solid var(--p-border);
+      border-radius: 24px;
+      padding: 0 8px 0 4px;
+      gap: 4px;
+      box-shadow: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
     }
 
-    .icon-btn {
-      min-width: 44px;
-      min-height: 44px;
-      border: none;
-      background: transparent;
-      color: var(--p-text-primary);
-      border-radius: 8px;
+    .search-capsule:focus-within {
+      border-color: var(--p-accent);
+    }
+
+    .search-menu-btn {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--p-text-primary);
       cursor: pointer;
-      user-select: none;
-      transition: background 0.15s ease;
+      flex-shrink: 0;
     }
 
-    .icon-btn:hover {
+    .search-menu-btn:hover {
       background: var(--p-surface-subtle);
     }
 
-    .icon-btn:active {
-      transform: scale(0.96);
-    }
-
-    .app-title {
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-      color: var(--p-text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Horizontally expanding search input inside top bar */
-    .top-bar-search-container {
-      position: absolute;
-      top: 8px;
-      left: 56px;
-      right: 12px;
-      bottom: 8px;
-      display: none;
-      align-items: center;
-      background: var(--p-surface);
-      border: 1px solid var(--p-border-strong);
-      border-radius: 10px;
-      padding: 0 8px 0 12px;
-      z-index: 45;
-      animation: searchExpand 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .top-bar-search-container.active {
-      display: flex;
-    }
-
-    @keyframes searchExpand {
-      from {
-        opacity: 0;
-        transform: scaleX(0.7);
-        transform-origin: right center;
-      }
-      to {
-        opacity: 1;
-        transform: scaleX(1);
-      }
-    }
-
     .search-input {
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       height: 100%;
       border: none;
       background: transparent;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--p-text-primary);
       outline: none;
       padding: 0 4px;
@@ -376,12 +348,49 @@
       color: var(--p-text-subtle);
     }
 
-    /* Main Scrollable Screen Body */
+    .search-clear-btn,
+    .search-action-btn {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--p-text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .search-clear-btn:hover,
+    .search-action-btn:hover {
+      background: var(--p-surface-subtle);
+      color: var(--p-accent);
+    }
+
+    /* Small Section Heading below search capsule */
+    .screen-subbar {
+      padding: 6px 12px 6px 12px;
+      background: var(--p-canvas);
+      flex-shrink: 0;
+    }
+
+    .inbox-section-heading {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--p-text-muted);
+    }
+
+    /* Main Scrollable Screen Body: minimal margins ~4-8px */
     .app-screen-body {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 8px 12px 90px 12px;
+      padding: 2px 6px 90px 6px;
       position: relative;
       -webkit-overflow-scrolling: touch;
     }
@@ -406,61 +415,11 @@
     }
 
     /* ==========================================================================
-       INBOX SCREEN STYLES
+       INBOX SCREEN STYLES (Broad flat Gmail-like rows, circular source initials)
        ========================================================================== */
-    /* Shortcut strip */
-    .shortcut-strip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      overflow-x: auto;
-      padding: 4px 0 10px 0;
-      scrollbar-width: none;
-    }
-
-    .shortcut-strip::-webkit-scrollbar {
-      display: none;
-    }
-
-    .shortcut-pill {
-      min-height: 44px;
-      padding: 0 14px;
-      border-radius: 22px;
-      font-size: 12px;
-      font-weight: 600;
-      border: 1px solid var(--p-border);
-      background: var(--p-surface);
-      color: var(--p-text-muted);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-      user-select: none;
-      flex-shrink: 0;
-    }
-
-    .shortcut-pill:hover {
-      border-color: var(--p-accent);
-    }
-
-    .shortcut-pill.active {
-      background: var(--p-accent-container);
-      color: var(--p-accent);
-      border-color: var(--p-accent);
-    }
-
-    .pill-count {
-      font-size: 11px;
-      opacity: 0.85;
-      font-weight: 500;
-    }
-
     /* Date section header */
     .date-header {
-      padding: 12px 4px 6px 4px;
+      padding: 8px 8px 4px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -471,45 +430,51 @@
       color: var(--p-text-subtle);
     }
 
-    /* Link list & Quiet list row */
+    /* Link list & Broad flat Gmail-like rows */
     .link-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 1px;
     }
 
     .link-card {
-      min-height: 72px;
-      padding: 10px 12px;
-      border-radius: 12px;
+      min-height: 68px;
+      padding: 8px 6px 8px 8px;
+      border-radius: 4px;
       background: var(--p-surface);
-      border: 1px solid var(--p-border);
+      border: none;
+      border-bottom: 1px solid var(--p-border);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
-      box-shadow: var(--p-card-shadow);
-      transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.05s ease;
+      box-shadow: none;
+      transition: background-color 0.15s ease;
       position: relative;
       user-select: none;
     }
 
     .link-card:hover {
-      border-color: var(--p-border-strong);
+      background: var(--p-surface-subtle);
     }
 
     .link-card:active {
       background: var(--p-surface-subtle);
     }
 
-    .link-icon-box {
+    /* Circular source initials */
+    .source-avatar {
       width: 40px;
       height: 40px;
-      border-radius: 10px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      user-select: none;
     }
 
     .link-details {
@@ -520,76 +485,94 @@
       gap: 2px;
     }
 
-    .link-title {
+    /* Line 1: Strong sender/source + right date */
+    .link-row-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .link-source-strong {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--p-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .link-date-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--p-text-subtle);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* Line 2: Prominent link title */
+    .link-title-line {
       font-size: 13px;
       font-weight: 600;
       color: var(--p-text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.35;
+      width: 100%;
+    }
+
+    /* Line 3: Compact host/context */
+    .link-row-context {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--p-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       line-height: 1.3;
     }
 
-    .link-meta-source {
-      font-size: 12px;
+    .context-host {
       color: var(--p-text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .link-tags-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 3px;
-    }
-
-    .meta-tag {
+    .context-tag {
       font-size: 11px;
       font-weight: 500;
-      padding: 1px 6px;
-      border-radius: 4px;
-      line-height: 1.3;
+      line-height: 1.2;
     }
 
-    .meta-tag.category {
-      background: var(--p-surface-subtle);
-      color: var(--p-text-muted);
-    }
-
-    .meta-tag.cleaned {
-      background: var(--p-success-bg);
+    .context-tag.context-cleaned {
       color: var(--p-success);
     }
 
-    .meta-tag.warning {
-      background: var(--p-warning-bg);
+    .context-tag.context-flagged {
       color: var(--p-warning);
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
+      font-weight: 600;
     }
 
-    .meta-tag.read-later {
-      background: var(--p-accent-container);
+    .context-tag.context-readlater {
       color: var(--p-accent);
     }
 
-    .link-timestamp {
-      font-size: 11px;
-      color: var(--p-text-subtle);
-      margin-left: auto;
-    }
-
-    /* Trailing favorite heart button */
+    /* Trailing favorite star button */
     .link-fav-btn {
       width: 44px;
       height: 44px;
+      min-width: 44px;
+      min-height: 44px;
       border: none;
       background: transparent;
       color: var(--p-text-subtle);
-      border-radius: 8px;
+      border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -599,11 +582,11 @@
     }
 
     .link-fav-btn:hover {
-      color: var(--p-accent);
+      color: #eab308;
     }
 
     .link-fav-btn.active {
-      color: var(--p-accent);
+      color: #eab308;
     }
 
     .link-fav-btn:active {
@@ -624,7 +607,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(14, 116, 144, 0.4);
+      box-shadow: 0 4px 14px rgba(88, 80, 156, 0.35);
       cursor: pointer;
       z-index: 35;
       transition: transform 0.15s ease, background-color 0.15s ease;
@@ -1821,30 +1804,25 @@
         </div>
       </div>
 
-      <!-- App Top Bar -->
+      <!-- App Top Bar: Persistent Search links capsule with hamburger -->
       <header class="app-top-bar" role="banner">
-        <div class="top-bar-left">
-          <button id="menuTriggerBtn" class="icon-btn" aria-label="Open Navigation Menu" aria-haspopup="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <div id="topBarSearchField" class="search-capsule" role="search">
+          <button id="menuTriggerBtn" class="icon-btn search-menu-btn" aria-label="Open navigation menu" aria-haspopup="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-          <span id="screenHeaderTitle" class="app-title">Inbox</span>
-        </div>
-
-        <div class="top-bar-right">
-          <button id="searchTriggerBtn" class="icon-btn" aria-label="Search Links">
-            <svg id="searchIconSvg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </button>
-        </div>
-
-        <!-- Horizontally expanding search input -->
-        <div id="topBarSearchField" class="top-bar-search-container" role="search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--p-text-subtle)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="searchInput" type="text" class="search-input" placeholder="Search links, domains, senders..." aria-label="Search saved links">
-          <button id="searchClearBtn" class="icon-btn" style="min-width:32px; min-height:32px; padding:0;" aria-label="Close search">
+          <input id="searchInput" type="text" class="search-input" placeholder="Search links" aria-label="Search links">
+          <button id="searchClearBtn" class="icon-btn search-clear-btn" style="display:none;" aria-label="Clear search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button id="searchTriggerBtn" class="icon-btn search-action-btn" aria-label="Search links">
+            <svg id="searchIconSvg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
         </div>
       </header>
+      <!-- Small Section Heading -->
+      <div class="screen-subbar">
+        <span id="screenHeaderTitle" class="inbox-section-heading">Inbox</span>
+      </div>
 
       <!-- Anchored Secondary Menu Popup -->
       <div id="anchoredMenuScrim" class="anchored-menu-scrim" aria-hidden="true"></div>
@@ -1902,26 +1880,6 @@
              SCREEN 1: INBOX (Top-to-bottom, Newest to Oldest)
              ================================================================== -->
         <section id="screen-inbox" class="screen-view active" aria-label="Inbox Links">
-          <!-- Shortcut filter pills -->
-          <div class="shortcut-strip" role="tablist" aria-label="Inbox Shortcut Filters">
-            <button class="shortcut-pill active" data-filter="all" role="tab" aria-selected="true">
-              <span>All</span>
-              <span class="pill-count" id="countAll">6</span>
-            </button>
-            <button class="shortcut-pill" data-filter="recent" role="tab" aria-selected="false">
-              <span>Recent</span>
-              <span class="pill-count" id="countRecent">3</span>
-            </button>
-            <button class="shortcut-pill" data-filter="favorites" role="tab" aria-selected="false">
-              <span>Favorites</span>
-              <span class="pill-count" id="countFavs">2</span>
-            </button>
-            <button class="shortcut-pill" data-filter="readlater" role="tab" aria-selected="false">
-              <span>Read later</span>
-              <span class="pill-count" id="countReadLater">2</span>
-            </button>
-          </div>
-
           <!-- Dynamic Link List Container -->
           <div id="inboxListContainer" class="link-list">
             <!-- Populated via renderInbox() -->
@@ -2597,6 +2555,54 @@
         });
       }
 
+      // Helpers for Gmail-like Link Row
+      function getSourceText(link) {
+        if (link.senderName && link.sourceApp) {
+          return `${link.senderName} · ${link.sourceApp}`;
+        }
+        if (link.senderName) return link.senderName;
+        if (link.sourceApp) return link.sourceApp;
+        return link.host;
+      }
+
+      function getSourceAvatar(link) {
+        const name = link.senderName || link.sourceApp || link.host || 'EL';
+        const parts = name.trim().split(/\s+/);
+        let initials = '';
+        if (parts.length >= 2) {
+          initials = (parts[0][0] + parts[1][0]).toUpperCase();
+        } else {
+          initials = name.slice(0, 2).toUpperCase();
+        }
+        const palettes = [
+          { bg: 'var(--avatar-bg-1)', color: 'var(--avatar-text-1)' },
+          { bg: 'var(--avatar-bg-2)', color: 'var(--avatar-text-2)' },
+          { bg: 'var(--avatar-bg-3)', color: 'var(--avatar-text-3)' },
+          { bg: 'var(--avatar-bg-4)', color: 'var(--avatar-text-4)' },
+          { bg: 'var(--avatar-bg-5)', color: 'var(--avatar-text-5)' },
+          { bg: 'var(--avatar-bg-6)', color: 'var(--avatar-text-6)' },
+        ];
+        const idx = Math.abs(link.id) % palettes.length;
+        return {
+          initials,
+          style: `background:${palettes[idx].bg}; color:${palettes[idx].color};`
+        };
+      }
+
+      function getContextHtml(link) {
+        let tags = '';
+        if (link.wasCleaned) {
+          tags += ` · <span class="context-tag context-cleaned">Cleaned</span>`;
+        }
+        if (link.isSuspicious) {
+          tags += ` · <span class="context-tag context-flagged">⚠️ Flagged</span>`;
+        }
+        if (link.isReadLater) {
+          tags += ` · <span class="context-tag context-readlater">Read later</span>`;
+        }
+        return tags;
+      }
+
       // Render Inbox Links (Grouped newest to oldest)
       function renderInbox() {
         const container = document.getElementById('inboxListContainer');
@@ -2604,12 +2610,16 @@
         const emptyTitle = document.getElementById('emptyTitle');
         const emptyDesc = document.getElementById('emptyDesc');
 
-        // Update counts
+        // Update counts safely if elements exist
         const activeLinks = isPopulated ? links.filter(l => !l.isArchived && !l.isBinned) : [];
-        document.getElementById('countAll').textContent = activeLinks.length;
-        document.getElementById('countRecent').textContent = activeLinks.filter(l => l.dateGroup === 'Today').length;
-        document.getElementById('countFavs').textContent = activeLinks.filter(l => l.isFavorite).length;
-        document.getElementById('countReadLater').textContent = activeLinks.filter(l => l.isReadLater).length;
+        const countAllEl = document.getElementById('countAll');
+        if (countAllEl) countAllEl.textContent = activeLinks.length;
+        const countRecentEl = document.getElementById('countRecent');
+        if (countRecentEl) countRecentEl.textContent = activeLinks.filter(l => l.dateGroup === 'Today').length;
+        const countFavsEl = document.getElementById('countFavs');
+        if (countFavsEl) countFavsEl.textContent = activeLinks.filter(l => l.isFavorite).length;
+        const countReadLaterEl = document.getElementById('countReadLater');
+        if (countReadLaterEl) countReadLaterEl.textContent = activeLinks.filter(l => l.isReadLater).length;
 
         const visibleLinks = getFilteredLinks();
 
@@ -2621,7 +2631,7 @@
             emptyDesc.textContent = `No links matching "${currentSearch}". Try checking spelling or resetting filters.`;
           } else if (currentFilter === 'favorites') {
             emptyTitle.textContent = "No favorites yet";
-            emptyDesc.textContent = "Tap the heart on any link row to save it to your Favorites.";
+            emptyDesc.textContent = "Tap the star on any link row to save it to your Favorites.";
           } else if (currentFilter === 'readlater') {
             emptyTitle.textContent = "No Read Later links";
             emptyDesc.textContent = "Mark links for quiet reading later from the link actions sheet.";
@@ -2655,32 +2665,28 @@
           `;
 
           groupLinks.forEach(link => {
-            const catObj = CATEGORIES.find(c => c.key === link.category) || CATEGORIES[7];
-            const senderPart = link.senderName ? ` · ${link.senderName}` : '';
-            const appPart = link.sourceApp ? ` · ${link.sourceApp}` : '';
-            const sourceMeta = `${link.host}${senderPart}${appPart}`;
+            const avatar = getSourceAvatar(link);
+            const sourceText = getSourceText(link);
+            const contextHtml = getContextHtml(link);
 
             html += `
-              <div class="link-card" data-id="${link.id}" role="button" tabindex="0" aria-label="${link.title}, from ${link.host}">
-                <div class="link-icon-box" style="background:${catObj.color}15; color:${catObj.color};" aria-hidden="true">
-                  ${getCategoryIcon(link.category)}
-                </div>
+              <div class="link-card" data-id="${link.id}" role="button" tabindex="0" aria-label="${link.title}, from ${sourceText}">
+                <div class="source-avatar" style="${avatar.style}" aria-hidden="true">${avatar.initials}</div>
 
                 <div class="link-details">
-                  <div class="link-title">${link.title}</div>
-                  <div class="link-meta-source">${sourceMeta}</div>
-                  <div class="link-tags-row">
-                    <span class="meta-tag category">${catObj.label}</span>
-                    ${link.wasCleaned ? '<span class="meta-tag cleaned">Cleaned</span>' : ''}
-                    ${link.isReadLater ? '<span class="meta-tag read-later">Read later</span>' : ''}
-                    ${link.isSuspicious ? '<span class="meta-tag warning"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Flagged</span>' : ''}
-                    <span class="link-timestamp">${link.timestampStr}</span>
+                  <div class="link-row-header">
+                    <span class="link-source-strong">${sourceText}</span>
+                    <span class="link-date-text">${link.timestampStr}</span>
+                  </div>
+                  <div class="link-title-line">${link.title}</div>
+                  <div class="link-row-context">
+                    <span class="context-host">${link.host}</span>${contextHtml}
                   </div>
                 </div>
 
                 <button class="link-fav-btn ${link.isFavorite ? 'active' : ''}" data-fav-id="${link.id}" aria-label="${link.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="${link.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="${link.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                   </svg>
                 </button>
               </div>
@@ -2986,21 +2992,22 @@
         });
       });
 
-      // Horizontally Expanding Search
+      // Persistent Search Controls
       searchTriggerBtn.addEventListener('click', () => {
-        topBarSearchField.classList.add('active');
         searchInput.focus();
       });
 
       searchClearBtn.addEventListener('click', () => {
         searchInput.value = '';
         currentSearch = '';
-        topBarSearchField.classList.remove('active');
+        searchClearBtn.style.display = 'none';
         renderInbox();
+        searchInput.focus();
       });
 
       searchInput.addEventListener('input', (e) => {
         currentSearch = e.target.value;
+        searchClearBtn.style.display = currentSearch.trim() ? 'inline-flex' : 'none';
         if (screenSelect.value !== 'inbox') switchScreen('inbox');
         renderInbox();
       });
@@ -3011,14 +3018,15 @@
         currentCategoryFilter = null;
         currentSearch = '';
         searchInput.value = '';
-        topBarSearchField.classList.remove('active');
+        searchClearBtn.style.display = 'none';
         document.querySelectorAll('.shortcut-pill').forEach(p => p.classList.remove('active'));
-        document.querySelector('.shortcut-pill[data-filter="all"]').classList.add('active');
+        const allPill = document.querySelector('.shortcut-pill[data-filter="all"]');
+        if (allPill) allPill.classList.add('active');
         renderInbox();
         showToast("Filters reset to default");
       });
 
-      // Shortcut Filter Pills
+      // Shortcut Filter Pills (safely handled if present)
       document.querySelectorAll('.shortcut-pill').forEach(pill => {
         pill.addEventListener('click', () => {
           document.querySelectorAll('.shortcut-pill').forEach(p => {

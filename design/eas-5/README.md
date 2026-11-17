@@ -1,30 +1,37 @@
-# EasyLink UI/UX Refinement Proposal (EAS-5)
+# EasyLink UI/UX Refinement Proposal (EAS-5) — Product Revision
 
 **Deliverables:**
 - Interactive Design Prototype: [`design/eas-5/index.html`](./index.html)
 - Design Tokens & Implementation Handoff: [`design/eas-5/README.md`](./README.md)
-- Status: **Proposal ready for product review before Android implementation**
+- Status: **Revised proposal ready for product review before Android implementation**
+- Reference Spec: [`tasks/TASK-EAS-5.md`](../../tasks/TASK-EAS-5.md) (Product Revision: Gmail Reference)
 - Branch: `eas-5-ui-refinement`
 
 ---
 
-## 1. Executive Summary & Design Rationale
+## 1. Executive Summary & Product Revision Rationale
 
-EasyLink is a quiet, local-first Android inbox for links captured from notifications and share intents. In accordance with [`UI.md`](../../UI.md) Section 10, the legacy high-saturation orange-on-black dark palette was rejected for lack of calm focus and eye fatigue.
+EasyLink is a quiet, local-first Android inbox for links captured from notifications and share intents. Per the owner's review of the EAS-5 proposal and reference Gmail screenshot, this document and [`design/eas-5/index.html`](./index.html) supersede earlier iterations (including the older Blue-Teal/Slate palette, top shortcut/filter strip, and floating card lists).
 
-This proposal refines the entire EasyLink visual and interaction architecture using:
-- **Calm Blue-Teal Accent** (`#0E7490` light / `#2DD4BF` dark) paired with **Slate Neutrals** (`#F8FAFC` light canvas / `#0F172A` dark canvas).
-- **Strict top-to-bottom, newest-to-oldest chronological ordering** in the Inbox, grouped cleanly under uppercase date headers (`TODAY`, `YESTERDAY`, `THIS WEEK`).
-- **Semantic Safety System**: Cleaned tracking status (green), caution heuristics (amber), and destructive/phishing danger (red).
-- **Quiet List Philosophy**: Text hierarchy and spacing structure the viewport; raw URLs are tucked away into the compact link-action sheet unless explicitly inspecting tracker cleanup.
-- **Strict Compliance with Boxes Visual Constraints**:
-  - Page background transparent.
-  - Host `data-theme` supported on `<html>`.
-  - Zero `vh` units in CSS/JS.
-  - Phone frame capped near 440px (412px standard Android flagship width).
-  - Review controls outside phone wrap responsively down to 360px without horizontal overflow.
-  - All controls labeled with accessible text and visible keyboard focus ring.
-  - Phone light/dark review toggle operates independently from the host theme.
+### 1.1 Core Directives from Product Revision
+- **Persistent Search Links Capsule with Hamburger**: In place of a traditional app bar with expanding search, a persistent rounded capsule (`48dp` height, `24dp` radius) houses the top-left hamburger menu trigger (`#menuTriggerBtn`), full-width live search input (`#searchInput`, placeholder "Search links"), clear button (`#searchClearBtn`), and search trigger (`#searchTriggerBtn`).
+- **Small Inbox Section Heading**: Directly below the search capsule, a small clean heading (`Inbox`) introduces the feed, matching the compact section header convention in modern Gmail on Android.
+- **Top Filter Strip Completely Removed**: The top shortcut filter strip (`All`, `Recent`, `Favorites`, `Read later`) has been removed entirely from the DOM (not merely hidden via CSS). Filtering listeners and count rendering references have been safely updated with existence guards.
+- **Broad Nearly Edge-to-Edge Gmail-like Rows**: Links occupy maximum horizontal space with minimal outer margins (~4–8px), broad flat rows (`min-height: 68dp`), restrained 1px hairline dividers (`border-bottom: 1px solid var(--p-border)`), and zero card shadows (`box-shadow: none`). Floating padded cards have been eliminated.
+- **Three-Line Row Content Hierarchy**:
+  1. **Circular Source Initials**: A 40dp circular avatar on the left displaying uppercase contact or source initials (e.g. `RT` for Rohit T, `KD` for Kotlin Devs, `SM` for SMS, `SK` for Sarah K, `RD` for Reddit, `AM` for Alex M) in soft container tones, replacing bulky rounded-square category icons.
+  2. **Line 1 (Strong Sender/Source + Right Date)**: Strong sender/source text on the left (`font-weight: 700`) paired with a right-aligned timestamp/date (`10:42 AM`, `Nov 16`).
+  3. **Line 2 (Prominent Link Title)**: Prominent single-line truncated title (`font-weight: 600`, line-height 1.35).
+  4. **Line 3 (Compact Host/Context)**: Hostname (`deepmind.google`) alongside restrained text tags (`Cleaned`, `⚠️ Flagged`, `Read later`), avoiding noisy badge clutter.
+  5. **Trailing Favorite Star**: A dedicated 5-point star icon button (`44x44dp` touch target) that turns golden amber (`#EAB308`) when active.
+- **Refined Color Palette**:
+  - **Light Mode**: Pale lavender neutral light canvas (`#F2F0F9`), crisp white/soft flat rows (`#FFFFFF`), and muted violet/indigo accent (`#58509C`).
+  - **Dark Mode**: Complementary deep neutral dark canvas (`#13111C`), soft flat dark rows (`#1C1A27`), and luminous muted violet/indigo accent (`#A399F3`).
+- **Fidelity to Real Product Behavior**:
+  - No invented unread semantics (no bold unread dots or unread count badges).
+  - No invented user accounts (no profile avatar inside the search capsule).
+  - Preserved bottom navigation: `Inbox` and `Library` tabs only.
+  - Fully functional link actions sheet (with side-by-side tracker cleanup disclosure), safety warning dialog for deceptive links, and prototype controls outside the phone frame.
 
 ---
 
@@ -34,234 +41,197 @@ This proposal refines the entire EasyLink visual and interaction architecture us
 
 | Semantic Role | Light Mode Hex | Dark Mode Hex | Usage |
 |---|---|---|---|
-| `accent` | `#0E7490` (Deep Calm Cyan-Teal) | `#2DD4BF` (Luminous Teal) | Primary actions, FAB, active tabs, selected states |
-| `accent-dark` | `#155E75` | `#14B8A6` | Button hover and active press |
-| `accent-container` | `#E0F2FE` (Sky-100 wash) | `#134E4A` (Teal-900) | Selected shortcut pills, recap hero card, icon backgrounds |
-| `on-accent-container`| `#0C4A6E` | `#CCFBF1` | Text/icons inside container surfaces |
-| `on-accent` | `#FFFFFF` | `#042F2E` | Text on solid accent buttons |
-| `canvas` | `#F8FAFC` (Slate-50) | `#0F172A` (Slate-900) | App floor / screen background |
-| `surface` | `#FFFFFF` (Card white) | `#1E293B` (Slate-800) | List rows, cards, bottom nav, popup menus |
-| `surface-subtle` | `#F1F5F9` (Slate-100) | `#334155` (Slate-700) | Secondary buttons, search bar, empty state circles |
-| `border` | `#E2E8F0` (Slate-200) | `#334155` (Slate-700) | 1px hairlines between rows and card borders |
-| `border-strong` | `#CBD5E1` (Slate-300) | `#475569` (Slate-600) | Selected borders, search outline, focused inputs |
-| `text-primary` | `#0F172A` (Slate-900) | `#F8FAFC` (Slate-50) | Link titles, screen headings, primary actions |
-| `text-muted` | `#475569` (Slate-600) | `#94A3B8` (Slate-400) | Hostnames, senders, secondary descriptions |
-| `text-subtle` | `#64748B` (Slate-500) | `#64748B` (Slate-500) | Timestamps, empty state captions, pill counts |
-| `success` | `#15803D` (Green-700) | `#4ADE80` (Green-400) | "Cleaned" badge, granted permissions |
-| `success-bg` | `#DCFCE7` (Green-100) | `#064E3B` (Green-950) | "Cleaned" pill container |
+| `canvas` | `#F2F0F9` (Pale Lavender Neutral) | `#13111C` (Deep Violet-Slate) | Floor / screen background behind search capsule & rows |
+| `surface` | `#FFFFFF` (Flat Card White) | `#1C1A27` (Deep Surface) | Flat link rows, search capsule, action sheets, menus |
+| `surface-subtle` | `#EAE7F6` (Soft Lavender Tint) | `#292639` (Slate-Violet Tint) | Secondary button hover, row active press, search pills |
+| `accent` | `#58509C` (Muted Violet/Indigo) | `#A399F3` (Luminous Violet) | Primary actions, FAB, active bottom nav, focus indicators |
+| `accent-dark` | `#443C82` | `#877CE3` | Button hover and pressed states |
+| `accent-container` | `#EDE9FE` (Soft Violet-100) | `#332D59` (Violet-900) | Recap hero card, active indicators, avatar containers |
+| `on-accent-container`| `#2B2269` | `#EDEAFC` | Text/icons inside accent containers |
+| `on-accent` | `#FFFFFF` | `#15112F` | Text on solid accent buttons |
+| `border` | `#E3E0F0` (Lavender Hairline) | `#2C293D` (Dark Hairline) | 1px hairline row dividers, card borders, menu dividers |
+| `border-strong` | `#CECADF` | `#413D59` | Focused inputs, popup outlines, selected borders |
+| `text-primary` | `#191627` (Deep Violet-Black) | `#F2F1F8` (Off-White) | Sender/source, link titles, screen headings |
+| `text-muted` | `#545068` (Muted Neutral) | `#A6A2BE` (Muted Slate) | Hostnames, secondary descriptions, screen subheadings |
+| `text-subtle` | `#797490` (Subtle Neutral) | `#7A7693` (Subtle Slate) | Timestamps/dates, empty state captions, placeholder text |
+| `favorite-star` | `#EAB308` (Amber-500) | `#FBBF24` (Amber-400) | Trailing favorite star active fill and hover state |
+| `card-shadow` | `none` | `none` | Zero box shadows on list rows per Gmail reference |
+| `success` | `#15803D` (Green-700) | `#4ADE80` (Green-400) | "Cleaned" tracker status, granted permissions |
+| `success-bg` | `#DCFCE7` (Green-100) | `#064E3B` (Green-950) | Success banner container |
 | `warning` | `#B45309` (Amber-700) | `#FBBF24` (Amber-400) | Suspicious heuristic warning tag & alerts |
-| `warning-bg` | `#FEF3C7` (Amber-100) | `#78350F` (Amber-950) | Warning pill container |
-| `danger` | `#B91C1C` (Red-700) | `#F87171` (Red-400) | "Move to Bin", destructive actions, phishing danger |
+| `warning-bg` | `#FEF3C7` (Amber-100) | `#78350F` (Amber-950) | Warning alert container |
+| `danger` | `#B91C1C` (Red-700) | `#F87171` (Red-400) | "Move to Bin", destructive actions, phishing alerts |
 | `danger-bg` | `#FEE2E2` (Red-100) | `#7F1D1D` (Red-950) | Destructive button hover, safety warning banner |
 
-### 2.2 Category Color Accents (Outlined Vector Icons & Sub-dots)
+### 2.2 Circular Avatar Container Tokens
 
-| Category | Light Hex | Dark Hex | Semantic Meaning & Outlined Vector |
+| Avatar Palette Slot | Light Background / Text | Dark Background / Text | Typical Assignment |
 |---|---|---|---|
-| **Videos** | `#0D9488` | `#2DD4BF` | Video player / play-rectangle (YouTube, Netflix, Vimeo) |
-| **Articles** | `#0284C7` | `#38BDF8` | Document / file-text (Blogs, publications, Medium) |
-| **Documents** | `#475569` | `#94A3B8` | File folder / code doc (PDF, markdown, dev specs) |
-| **Social** | `#4F46E5` | `#818CF8` | Message bubble / user group (Mastodon, Bluesky, X) |
-| **Shopping** | `#D97706` | `#FBBF24` | Shopping bag (Products, stores, wishlist) |
-| **Maps** | `#059669` | `#34D399` | Map pin (Locations, navigation links) |
-| **Music** | `#7C3AED` | `#A78BFA` | Musical note / headphones (Spotify, Bandcamp) |
-| **Other** | `#0891B2` | `#22D3EE` | Universal link / globe (General links) |
+| Slot 1 (Violet) | `#EDE9FE` / `#5B21B6` | `#2E1065` / `#C4B5FD` | Telegram contacts, Rohit T (`RT`) |
+| Slot 2 (Indigo) | `#E0E7FF` / `#3730A3` | `#1E1B4B` / `#A5B4FC` | Telegram channels, Kotlin Devs (`KD`) |
+| Slot 3 (Sky) | `#E0F2FE` / `#0369A1` | `#082F49` / `#7DD3FC` | SMS captures (`SM`) |
+| Slot 4 (Green) | `#DCFCE7` / `#15803D` | `#052E16` / `#86EFAC` | WhatsApp contacts, Sarah K (`SK`) |
+| Slot 5 (Amber) | `#FEF3C7` / `#B45309` | `#451A03` / `#FDE68A` | Reddit captures (`RD`) |
+| Slot 6 (Rose) | `#FCE7F3` / `#BE185D` | `#4C0519` / `#FBCFE8` | Telegram contacts, Alex M (`AM`) |
 
 ---
 
 ## 3. Screen Inventory & Feature Fidelity
 
-### 3.1 Inbox Screen
-- **Top App Bar**:
-  - Left: Hamburger icon trigger for the compact anchored secondary menu.
-  - Center: Clean screen title `Inbox`.
-  - Right: Search icon that expands smoothly toward the left without obscuring the menu button.
-- **Expanding Search Bar**:
-  - Auto-focuses keyboard controller.
-  - Live filtering against link titles, hostnames, sender display names, and source app names.
-  - Dedicated Clear button (`X`) and graceful collapse.
-  - If no matches: displays friendly "No matches found" empty state with one-tap "Reset Filters" action.
-- **Configurable Shortcut Strip**:
-  - Four default smart shortcuts: `All`, `Recent` (24-hour window), `Favorites`, and `Read later`.
-  - Accessible pill bounding boxes (>44px touch region).
-  - Live count indicator on each pill.
-- **Chronological Link List**:
-  - **Strictly newest-to-oldest ordering**.
-  - Categorized under sticky date headers (`TODAY`, `YESTERDAY`, `THIS WEEK`).
-  - Leading visual: One unified outlined vector icon per category (no mixed favicon/thumbnail inconsistency).
-  - Title: Strongest visual element in the row.
-  - Subtitle: `hostname · Sender Name · Source App`.
-  - Status Pills: `Cleaned` (green), `Read later` (teal container), `Flagged` (amber warning).
-  - Trailing Action: Dedicated Favorite heart button (one-tap toggle without opening sheet).
+### 3.1 Inbox Screen (Revised Gmail Layout)
+- **Persistent Search Links Capsule (`#topBarSearchField`)**:
+  - Embedded hamburger menu button (`#menuTriggerBtn`) on the left (40x40dp, accessible touch region).
+  - Live filtering text input (`#searchInput`, placeholder "Search links") filtering across link titles, hostnames, sender display names, and source app names.
+  - Auto-appearing Clear button (`#searchClearBtn`, `X`) when text is present.
+  - Search trigger icon (`#searchTriggerBtn`, `#searchIconSvg`) on the right.
+- **Small Inbox Section Heading (`#screenHeaderTitle`)**:
+  - Positioned in `.screen-subbar` directly below the search capsule.
+  - Small, clean, muted typography (`font-size: 13px`, `font-weight: 700`, `letter-spacing: 0.2px`, `color: var(--p-text-muted)`).
+- **Top Filter Strip Completely Removed**:
+  - The older horizontal shortcut pills (`All`, `Recent`, `Favorites`, `Read later`) have been removed completely from DOM.
+  - All count references (`#countAll`, `#countRecent`, `#countFavs`, `#countReadLater`) and filter pill listeners are guarded safely against null references.
+- **Chronological Link List (`#inboxListContainer`)**:
+  - **Strictly newest-to-oldest ordering**: Today, Yesterday, This Week.
+  - Minimal outer margins (~4–8px), flat rows with 1px hairline dividers (`border-bottom: 1px solid var(--p-border)`), zero card shadows.
+  - Leading visual: 40dp circular source initials avatar (`.source-avatar`).
+  - Line 1: Strong sender/source on left (`.link-source-strong`), right-aligned date/timestamp (`.link-date-text`).
+  - Line 2: Prominent link title (`.link-title-line`).
+  - Line 3: Compact host (`.context-host`) with subtle contextual text tags (`Cleaned`, `⚠️ Flagged`, `Read later`).
+  - Trailing Action: Dedicated favorite star button (`.link-fav-btn`, 44x44dp) toggling gold fill (`#EAB308`).
   - Row tap: Opens the compact Link Action Sheet.
-- **Floating Action Button (FAB)**:
-  - Bottom-right compact rounded square (52dp, 16dp radius), thumb-accessible above bottom navigation.
-  - Tapping opens the "Add Link to Inbox" modal.
+- **Floating Action Button (`#fabAddBtn`)**:
+  - Rounded square (52dp, 16dp radius), thumb-accessible on Inbox, styled with muted violet accent (`#58509C`).
 
-### 3.2 Compact Anchored Secondary Menu
-- Anchored directly below the top-left hamburger button.
-- Dimensions: Width 252dp, max height 360dp, 14dp rounded corners.
-- Preserves surrounding viewport context through a subtle scrim.
-- Ordered destinations:
-  1. `Insights` (local recap)
-  2. `Archive`
-  3. `Bin` (with "30 days" badge)
-  4. Pinned collections: `Research & AI`, `Weekend Reads`
-  5. Divider
-  6. `Customize` (theme & gestures)
-  7. `Settings` (operational settings)
-  8. `About EasyLink` (privacy guarantee)
+### 3.2 Compact Anchored Secondary Menu (`#anchoredDropdown`)
+- Anchored directly below the top-left hamburger button (`top: 62px`, `left: 12px`, `width: 252px`).
+- Destinations: `Insights`, `Archive`, `Bin` (30 days badge), Pinned collections (`Research & AI`, `Weekend Reads`), `Customize`, `Settings`, `About EasyLink`.
 
-### 3.3 Compact Link Action Sheet
+### 3.3 Compact Link Action Sheet (`#actionSheetBackdrop`)
 - Content-wrapped modal bottom sheet capped at 410px.
-- **Header**: Category icon, Title, Hostname, Source app, Sender, Time.
-- **Row 1 (Primary Actions)**:
-  - `Open`: Directly navigates or triggers the Safety Sheet if suspicious.
-  - `Copy`: Copies the Cleaned URL to clipboard with confirmation toast.
-  - `Share`: Invokes Android share intent.
-  - `Edit`: Opens link editor modal.
-- **Tracker Cleanup Disclosure Box**:
-  - Explicit side-by-side disclosure:
-    - **Cleaned URL**: Stripped parameters with dedicated Copy button.
-    - **Original URL**: Preserved original link with dedicated Copy button.
-    - Informative note: "Tracking parameters stripped (Cleaned)".
+- **Header**: Title, Hostname, Source app, Sender, Time.
+- **Row 1 (Primary Actions)**: `Open` (triggers Safety Sheet if suspicious), `Copy` (copies Cleaned URL), `Share`, `Edit`.
+- **Tracker Cleanup Disclosure Box (`#trackerDisclosureBox`)**:
+  - Side-by-side disclosure: **Cleaned URL** vs **Original URL** with dedicated independent Copy buttons.
 - **Row 2 (Status Toggles)**: `Read later` toggle & `Favorite` toggle.
-- **Row 3 (Destructive / Lifecycle)**:
-  - `Archive`: Moves to archive, provides undo snackbar.
-  - `Move to Bin`: Red destructive styling, recoverable for 30 days.
+- **Row 3 (Lifecycle Actions)**: `Archive` (with undo toast) & `Move to Bin` (recoverable for 30 days).
 
-### 3.4 Safety Warning Sheet / Dialog
-- Triggered whenever an unsafe or suspicious link is clicked (e.g. `paypa1-account-security-verify.top`).
-- Heuristic checks: IP hostnames, suspicious TLDs (`.top`, `.cf`, `.ml`), lookalike protected brands in subdomains.
-- Explicit, honest copy: "EasyLink local heuristics flagged characteristics commonly used by deceptive links. This is an on-device check, not a guarantee."
-- Actions: Recommended "Keep Safe" (primary neutral) and "Open Anyway" (destructive outlined).
+### 3.4 Safety Warning Sheet / Dialog (`#safetyModalBackdrop`)
+- Triggered whenever a suspicious or deceptive link is clicked (e.g. `paypa1-account-security-verify.top`).
+- On-device heuristic checks: IP hostnames, suspicious TLDs (`.top`, `.cf`, `.ml`), lookalike protected brands.
+- Transparent disclaimer: local heuristics check, not a guarantee.
+- Actions: Recommended "Keep Safe" (`#safetyCancelBtn`) and "Open Anyway" (`#safetyProceedBtn`).
 
-### 3.5 Library Screen
-- **Categories (2x4 Grid)**: Shows active link counts calculated with `archivedAt IS NULL AND deletedAt IS NULL`. Tapping a category immediately filters the Inbox.
-- **Collections**: Lists user collections with item counts and pinned status. Includes "+ New" collection trigger.
-- **Automation**: Domain-based routing rules featuring the app-owned **Route** vector icon (no decorative sparkles). Includes interactive toggle switches for each rule.
+### 3.5 Library Screen (`#screen-library`)
+- **Categories Grid (`#categoryGrid`)**: 2x4 grid with active counts (`archivedAt IS NULL AND deletedAt IS NULL`). Tapping filters Inbox.
+- **Collections (`#collectionsList`)**: User collections with item counts.
+- **Automation (`#rulesList`)**: Domain-based routing rules featuring the app-owned **Route** vector icon with interactive toggle switches.
 
-### 3.6 Insights Screen
-- **Hero Card**: "7-Day Local Recap" summarizing total links captured and primary sources.
-- **Top Sources**: Ranked list (Telegram, Slack, WhatsApp).
-- **Top Domains**: Clean breakdown (`github.com`, `deepmind.google`, `youtube.com`).
-- **Local Privacy Notice**: "Calculated 100% on this device. EasyLink never transmits reading habits or insight summaries."
+### 3.6 Insights Screen (`#screen-insights`)
+- **Hero Card**: "7-Day Local Recap" with total links captured and primary sources.
+- **Top Sources & Domains Breakdown**: Ranked breakdowns.
+- **Local Privacy Notice**: 100% on-device guarantee.
 
 ### 3.7 Customize & Settings Screens
-- **Customize**: Appearance selector (`System`, `Light`, `Dark`) and mutually exclusive gesture profiles:
-  - *Link actions (Recommended default)*
-  - *Browse lists*
-  - *No swipe actions*
-- **Settings**:
-  - Mute button behavior dropdown: `Silence alerts` (recommended default) vs `Ignore future links`.
-  - Muted senders manager (showing exact `(sourceApp, senderName)` rules with one-tap Unmute).
-  - Tracker cleanup toggle.
-  - Local safety heuristics toggle.
-  - Automatic retention cleanup (90 days).
-
-### 3.8 Notification Capture & Exact Sender Mute
-- Simulated incoming Android notification: `"Rohit shared a link"`.
-- Notification action buttons: `Open`, `Copy`, `Mute Rohit`.
-- Tapping `Mute` executes exact-sender silence rule without fuzzy contact matching.
+- **Customize (`#screen-customize`)**: Theme selector (`System`, `Light`, `Dark`) and gesture profiles.
+- **Settings (`#screen-settings`)**: Exact sender mute manager, tracker cleanup toggle, local safety heuristics toggle.
 
 ---
 
 ## 4. Implementation Handoff for Android Jetpack Compose
 
-To apply this refinement to the Android app source code in a future task:
+To apply this refined Violet / Pale Lavender palette to the Android app in a future task:
 
 ### 4.1 Update `app/src/main/java/com/iv/easylink/ui/theme/EasyLinkTheme.kt`
 
-Replace the legacy terracotta palette with the approved Blue-Teal / Slate system:
-
 ```kotlin
-// Blue-Teal Accent Palette
-private val TealPrimary = Color(0xFF0E7490)       // Cyan-700
-private val TealPrimaryDark = Color(0xFF2DD4BF)   // Teal-400
-private val TealContainer = Color(0xFFE0F2FE)     // Sky-100
-private val TealContainerDark = Color(0xFF134E4A) // Teal-900
+// Muted Violet / Indigo Accent Palette
+private val VioletPrimary = Color(0xFF58509C)       // Muted Violet-700
+private val VioletPrimaryDark = Color(0xFFA399F3)   // Luminous Violet-400
+private val VioletContainer = Color(0xFFEDE9FE)     // Violet-100
+private val VioletContainerDark = Color(0xFF332D59) // Violet-900
 
-// Slate Neutral Palette
-private val SlateCanvas = Color(0xFFF8FAFC)       // Slate-50
-private val SlateCanvasDark = Color(0xFF0F172A)   // Slate-900
-private val SlateSurface = Color(0xFFFFFFFF)
-private val SlateSurfaceDark = Color(0xFF1E293B)   // Slate-800
-private val SlateSubtle = Color(0xFFF1F5F9)       // Slate-100
-private val SlateSubtleDark = Color(0xFF334155)   // Slate-700
-private val SlateBorder = Color(0xFFE2E8F0)       // Slate-200
-private val SlateBorderDark = Color(0xFF334155)   // Slate-700
-private val SlateText = Color(0xFF0F172A)         // Slate-900
-private val SlateTextDark = Color(0xFFF8FAFC)     // Slate-50
-private val SlateMuted = Color(0xFF475569)        // Slate-600
-private val SlateMutedDark = Color(0xFF94A3B8)    // Slate-400
+// Pale Lavender Neutral Palette
+private val LavenderCanvas = Color(0xFFF2F0F9)       // Pale Lavender Neutral
+private val LavenderCanvasDark = Color(0xFF13111C)   // Deep Violet-Slate
+private val FlatSurface = Color(0xFFFFFFFF)          // Crisp White Row
+private val FlatSurfaceDark = Color(0xFF1C1A27)      // Flat Dark Surface
+private val SurfaceSubtle = Color(0xFFEAE7F6)        // Soft Lavender Tint
+private val SurfaceSubtleDark = Color(0xFF292639)    // Dark Tint
+private val HairlineBorder = Color(0xFFE3E0F0)       // 1px Hairline Divider
+private val HairlineBorderDark = Color(0xFF2C293D)   // Dark Hairline
+private val TextPrimary = Color(0xFF191627)          // Deep Violet-Black
+private val TextPrimaryDark = Color(0xFFF2F1F8)      // Off-White
+private val TextMuted = Color(0xFF545068)            // Muted Neutral
+private val TextMutedDark = Color(0xFFA6A2BE)        // Muted Slate
 
-object TealSlateThemeStyle : ThemeStyle {
-    override val id = "teal_slate"
+object VioletNeutralThemeStyle : ThemeStyle {
+    override val id = "violet_neutral"
     override val lightColors = lightColorScheme(
-        primary = TealPrimary,
+        primary = VioletPrimary,
         onPrimary = Color.White,
-        primaryContainer = TealContainer,
-        onPrimaryContainer = Color(0xFF0C4A6E),
-        background = SlateCanvas,
-        onBackground = SlateText,
-        surface = SlateSurface,
-        onSurface = SlateText,
-        surfaceVariant = SlateSubtle,
-        onSurfaceVariant = SlateMuted,
-        outline = SlateBorder,
-        outlineVariant = Color(0xFFCBD5E1),
+        primaryContainer = VioletContainer,
+        onPrimaryContainer = Color(0xFF2B2269),
+        background = LavenderCanvas,
+        onBackground = TextPrimary,
+        surface = FlatSurface,
+        onSurface = TextPrimary,
+        surfaceVariant = SurfaceSubtle,
+        onSurfaceVariant = TextMuted,
+        outline = HairlineBorder,
+        outlineVariant = Color(0xFFCECADF),
         error = Color(0xFFB91C1C),
     )
     override val darkColors = darkColorScheme(
-        primary = TealPrimaryDark,
-        onPrimary = Color(0xFF042F2E),
-        primaryContainer = TealContainerDark,
-        onPrimaryContainer = Color(0xFFCCFBF1),
-        background = SlateCanvasDark,
-        onBackground = SlateTextDark,
-        surface = SlateSurfaceDark,
-        onSurface = SlateTextDark,
-        surfaceVariant = SlateSubtleDark,
-        onSurfaceVariant = SlateMutedDark,
-        outline = SlateBorderDark,
-        outlineVariant = Color(0xFF475569),
+        primary = VioletPrimaryDark,
+        onPrimary = Color(0xFF15112F),
+        primaryContainer = VioletContainerDark,
+        onPrimaryContainer = Color(0xFFEDEAFC),
+        background = LavenderCanvasDark,
+        onBackground = TextPrimaryDark,
+        surface = FlatSurfaceDark,
+        onSurface = TextPrimaryDark,
+        surfaceVariant = SurfaceSubtleDark,
+        onSurfaceVariant = TextMutedDark,
+        outline = HairlineBorderDark,
+        outlineVariant = Color(0xFF413D59),
         error = Color(0xFFF87171),
     )
     override val extras = EasyLinkExtraColors(
-        card = SlateSurface,
-        softSurface = SlateSubtle,
-        mutedText = SlateMuted,
+        card = FlatSurface,
+        softSurface = SurfaceSubtle,
+        mutedText = TextMuted,
         success = Color(0xFF15803D),
         warning = Color(0xFFB45309),
+        favoriteStar = Color(0xFFEAB308),
         categoryColors = listOf(
-            Color(0xFF0891B2), // Other
+            Color(0xFF58509C), // Primary Violet
             Color(0xFF0D9488), // Videos
             Color(0xFF0284C7), // Articles
             Color(0xFF4F46E5), // Social
             Color(0xFFD97706), // Shopping
             Color(0xFF059669), // Maps
             Color(0xFF7C3AED), // Music
-            Color(0xFF475569), // Documents
+            Color(0xFF545068), // Documents
         ),
     )
     override val darkExtras = EasyLinkExtraColors(
-        card = SlateSurfaceDark,
-        softSurface = SlateSubtleDark,
-        mutedText = SlateMutedDark,
+        card = FlatSurfaceDark,
+        softSurface = SurfaceSubtleDark,
+        mutedText = TextMutedDark,
         success = Color(0xFF4ADE80),
         warning = Color(0xFFFBBF24),
+        favoriteStar = Color(0xFFFBBF24),
         categoryColors = listOf(
-            Color(0xFF22D3EE),
+            Color(0xFFA399F3),
             Color(0xFF2DD4BF),
             Color(0xFF38BDF8),
             Color(0xFF818CF8),
             Color(0xFFFBBF24),
             Color(0xFF34D399),
             Color(0xFFB88E9E),
-            Color(0xFF94A3B8),
+            Color(0xFFA6A2BE),
         ),
     )
-    // Typography and Shapes inherit existing standards with 11px floor
 }
 ```
 
@@ -269,18 +239,20 @@ object TealSlateThemeStyle : ThemeStyle {
 
 ## 5. Verification Checklist
 
-- [x] **File Structure**: `design/eas-5/index.html` and `design/eas-5/README.md` self-contained and editable.
-- [x] **Android Source Untouched**: Verified via `git status` that `app/`, `preview.html`, tests, and build scripts have zero modifications.
-- [x] **Zero `vh` Units**: Grep check confirmed zero occurrences of `[0-9]vh` in CSS/JS.
-- [x] **Page Background**: Transparent background configured on `html` and `body`.
-- [x] **Host Data-Theme**: Full support for `html[data-theme="dark"]` and `html[data-theme="light"]`.
-- [x] **Phone Theme Independence**: Phone light/dark toggle controls `.phone-frame[data-phone-theme]` without altering host theme.
-- [x] **Phone Capping**: Phone width capped at 412px (below 440px constraint).
-- [x] **360px Responsiveness**: Review toolbar outside phone wraps cleanly without horizontal overflow.
-- [x] **Accessibility & Keyboard Focus**: Every interactive control features `:focus-visible` styling (`2px solid #0284c7`, offset `2px`) and appropriate ARIA attributes.
-- [x] **44px+ Tap Targets**: All buttons, nav items, menu rows, and action items provide minimum 44px touch regions.
-- [x] **Typography Floor**: Zero font sizes below 11px.
-- [x] **Newest-to-Oldest Ordering**: Verified chronological top-to-bottom Inbox list.
-- [x] **Tracker Disclosure**: Side-by-side disclosure of Cleaned URL vs Original URL with independent copy actions.
-- [x] **Safety Warning Flow**: Working prompt with simulated suspicious link interception.
-- [x] **No External Dependencies**: Zero remote fonts, zero CDN links, zero external scripts. All SVG graphics rendered inline.
+- [x] **Top Filter Strip Completely Removed**: Verified that `.shortcut-strip` is eliminated entirely from `#screen-inbox` in HTML and CSS.
+- [x] **Safe Filtering & Count References**: `countAll`, `countRecent`, `countFavs`, and `countReadLater` references in JS are guarded with existence checks (`if (el) ...`), ensuring zero console errors.
+- [x] **Persistent Search Links Capsule**: Verified persistent capsule `#topBarSearchField` containing `#menuTriggerBtn`, `#searchInput`, `#searchClearBtn`, and `#searchTriggerBtn`.
+- [x] **Small Inbox Section Heading**: Verified `#screenHeaderTitle` rendered in `.screen-subbar` directly beneath the search capsule.
+- [x] **Broad Flat Gmail-like Rows**: Verified minimal outer margins (~4–8px), flat rows with 1px hairline dividers, and zero card shadows (`box-shadow: none`).
+- [x] **Circular Source Initials**: Verified 40dp circular avatar on the left displaying contact/source initials with soft container colors.
+- [x] **Three-Line Row Content**:
+  - Line 1: Strong sender/source on left (`.link-source-strong`) + right-aligned date (`.link-date-text`).
+  - Line 2: Prominent link title (`.link-title-line`).
+  - Line 3: Compact host (`.context-host`) and restrained context status (`Cleaned`, `Flagged`, `Read later`).
+  - Trailing Action: Dedicated favorite star (`.link-fav-btn`) with 5-point polygon turning gold (`#EAB308`).
+- [x] **Palette Updated**: Pale lavender neutral light canvas (`#F2F0F9`), white/soft flat rows (`#FFFFFF`), muted violet/indigo accent (`#58509C`), and complementary dark palette (`#13111C` canvas, `#1C1A27` surface, `#A399F3` accent).
+- [x] **Real Product Behavior Maintained**: No unread semantics, no user account avatar, bottom nav with Inbox/Library retained, action sheet and safety warning functional.
+- [x] **Zero `vh` Units**: Confirmed zero occurrences of `[0-9]vh` in CSS/JS.
+- [x] **Typography Floor**: Confirmed zero font sizes below 11px.
+- [x] **44px+ Touch Targets**: All buttons, nav items, search triggers, star buttons, and rows adhere to accessibility standards.
+- [x] **Android Source & Build Files Untouched**: No changes to `app/`, tests, build files, or existing `preview.html`.

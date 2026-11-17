@@ -36,3 +36,18 @@ Design is a proposal, not a completed Android refinement.
 ## Verification
 Review source diff; preview light, dark, 360px and 1280px; inspect screenshots.
 Check controls and console. No Android builds for design-only deliverable.
+
+## Product revision — Gmail reference
+Owner supplied a Gmail screenshot and requests:
+- Remove the top Inbox shortcut/filter strip entirely (All/Recent/Favorites/Read later).
+- Use more horizontal space per link: minimal outer margins, broad flat rows,
+  restrained separators/gaps instead of floating padded cards.
+- Follow the screenshot layout: pale neutral/lavender canvas, persistent rounded
+  search field and hamburger, small Inbox heading, circular source initials,
+  sender/source as strong first line with date on the right, prominent link title
+  second line, compact host/context third line, trailing favorite star.
+- Maintain newest-first order and working search, actions, safety and theme controls.
+- No mail/account/chat/video features; retain EasyLink Inbox/Library navigation.
+- Update README to supersede conflicting older row/filter/search/palette guidance.
+Reference image (read-only):
+/home/boxes/.devbox/desktop-attachments/easylink-d88dad64648b/ph7fjhxr1t1jwxnw7vv12vnn498jbtz2/1000072122.jpg
