@@ -51,3 +51,19 @@ Owner supplied a Gmail screenshot and requests:
 - Update README to supersede conflicting older row/filter/search/palette guidance.
 Reference image (read-only):
 /home/boxes/.devbox/desktop-attachments/easylink-d88dad64648b/ph7fjhxr1t1jwxnw7vv12vnn498jbtz2/1000072122.jpg
+
+## Product revision — dark neutral / restrained accent
+Owner rejects blue/AI-looking colors, especially notification styling. Explore
+Netflix-inspired charcoal/red OR Spotify-inspired charcoal/green, without brand
+logos or copying unrelated media-app navigation. Add a review-only palette toggle
+for the two directions; default charcoal/green until owner chooses. Dark phone
+mode should open initially; keep a neutral light alternative.
+- Replace blue/lavender/violet tones across all screens, focus rings, review copy,
+  source avatars, category tints and banners. Neutral charcoal surfaces dominate;
+  green/red used sparingly. Keep safety semantics legible and distinct.
+- Notification: platform-like compact neutral Android heads-up card, monochrome
+  small icon, plain sender-active title, host/snippet, native-looking text actions
+  Open / Copy / Mute. No promotional badges, glow, gradients, colored cards or
+  saturated icon tile. This is a simulation, not a custom OS notification promise.
+- Preserve Gmail-like full-width rows, no top filters, newest-first ordering.
+- Update README and review labels; no Android code or build changes.

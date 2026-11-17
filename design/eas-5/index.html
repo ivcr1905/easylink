@@ -17,7 +17,7 @@
       --host-surface-hover: #f1f5f9;
       --host-border: #cbd5e1;
       --host-chip-bg: #e2e8f0;
-      --host-focus: #0284c7;
+      --host-focus: #1ed760;
     }
 
     html[data-theme="dark"] {
@@ -27,7 +27,7 @@
       --host-surface-hover: #334155;
       --host-border: #334155;
       --host-chip-bg: #334155;
-      --host-focus: #38bdf8;
+      --host-focus: #1ed760;
     }
 
     *, *::before, *::after {
@@ -62,7 +62,7 @@
     select:focus-visible,
     a:focus-visible,
     [tabindex="0"]:focus-visible {
-      outline: 2px solid #0284c7;
+      outline: 2px solid var(--p-accent, #1ed760);
       outline-offset: 2px;
     }
 
@@ -93,7 +93,7 @@
       width: 12px;
       height: 12px;
       border-radius: 4px;
-      background: #58509c;
+      background: var(--p-accent, #1ed760);
     }
 
     .review-title {
@@ -144,9 +144,9 @@
     }
 
     .review-btn.active {
-      background: #58509c;
-      color: #ffffff;
-      border-color: #58509c;
+      background: var(--p-accent, #1ed760);
+      color: var(--p-on-accent, #000000);
+      border-color: var(--p-accent, #1ed760);
     }
 
     .review-screens-select {
@@ -165,7 +165,8 @@
     /* ==========================================================================
        PHONE CONTAINER & COLOR TOKENS
        (Separate Phone Theme Toggle from Host Theme)
-       Calm Blue-Teal accent with Slate neutrals & Semantic safety colors
+       Dark neutral surfaces with restrained Spotify-inspired green or
+       Netflix-inspired red accents.
        ========================================================================== */
     .phone-frame {
       width: 100%;
@@ -177,78 +178,110 @@
       display: flex;
       flex-direction: column;
       border: 8px solid var(--p-bezel);
-      box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px var(--p-border);
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--p-border);
       transition: background-color 0.2s ease, border-color 0.2s ease;
       background-color: var(--p-canvas);
       color: var(--p-text-primary);
     }
 
-    /* Light Phone Theme Tokens: Pale lavender neutral canvas, white/soft flat rows, muted violet/indigo accent */
-    .phone-frame[data-phone-theme="light"] {
-      --p-bezel: #161424;
-      --p-canvas: #f2f0f9;
-      --p-surface: #ffffff;
-      --p-surface-subtle: #eae7f6;
-      --p-border: #e3e0f0;
-      --p-border-strong: #cecadf;
-      --p-text-primary: #191627;
-      --p-text-muted: #545068;
-      --p-text-subtle: #797490;
-      --p-accent: #58509c;
-      --p-accent-dark: #443c82;
-      --p-accent-container: #ede9fe;
-      --p-on-accent-container: #2b2269;
-      --p-on-accent: #ffffff;
-      --p-success: #15803d;
-      --p-success-bg: #dcfce7;
-      --p-warning: #b45309;
-      --p-warning-bg: #fef3c7;
-      --p-danger: #b91c1c;
-      --p-danger-bg: #fee2e2;
-      --p-status-icon: #191627;
-      --p-card-shadow: none;
-      --p-sheet-backdrop: rgba(25, 22, 39, 0.45);
-      --p-menu-bg: #ffffff;
-      --avatar-bg-1: #ede9fe; --avatar-text-1: #5b21b6;
-      --avatar-bg-2: #e0e7ff; --avatar-text-2: #3730a3;
-      --avatar-bg-3: #e0f2fe; --avatar-text-3: #0369a1;
-      --avatar-bg-4: #dcfce7; --avatar-text-4: #15803d;
-      --avatar-bg-5: #fef3c7; --avatar-text-5: #b45309;
-      --avatar-bg-6: #fce7f3; --avatar-text-6: #be185d;
-    }
-
-    /* Dark Phone Theme Tokens: Complementary dark palette */
+    /* Shared Neutral Dark Phone Theme Tokens (Charcoal neutral default) */
     .phone-frame[data-phone-theme="dark"] {
-      --p-bezel: #09080e;
-      --p-canvas: #13111c;
-      --p-surface: #1c1a27;
-      --p-surface-subtle: #292639;
-      --p-border: #2c293d;
-      --p-border-strong: #413d59;
-      --p-text-primary: #f2f1f8;
-      --p-text-muted: #a6a2be;
-      --p-text-subtle: #7a7693;
-      --p-accent: #a399f3;
-      --p-accent-dark: #877ce3;
-      --p-accent-container: #332d59;
-      --p-on-accent-container: #edeafc;
-      --p-on-accent: #15112f;
+      --p-bezel: #09090b;
+      --p-canvas: #121212;
+      --p-surface: #1e1e20;
+      --p-surface-subtle: #27272a;
+      --p-border: #2d2d32;
+      --p-border-strong: #3f3f46;
+      --p-text-primary: #f4f4f5;
+      --p-text-muted: #a1a1aa;
+      --p-text-subtle: #71717a;
+      --p-status-icon: #f4f4f5;
+      --p-card-shadow: none;
+      --p-sheet-backdrop: rgba(0, 0, 0, 0.75);
+      --p-menu-bg: #1e1e20;
+      --p-avatar-bg: #27272a;
+      --p-avatar-text: #e4e4e7;
+      --avatar-bg-1: #27272a; --avatar-text-1: #e4e4e7;
+      --avatar-bg-2: #27272a; --avatar-text-2: #e4e4e7;
+      --avatar-bg-3: #27272a; --avatar-text-3: #e4e4e7;
+      --avatar-bg-4: #27272a; --avatar-text-4: #e4e4e7;
+      --avatar-bg-5: #27272a; --avatar-text-5: #e4e4e7;
+      --avatar-bg-6: #27272a; --avatar-text-6: #e4e4e7;
       --p-success: #4ade80;
       --p-success-bg: #064e3b;
       --p-warning: #fbbf24;
       --p-warning-bg: #78350f;
       --p-danger: #f87171;
       --p-danger-bg: #7f1d1d;
-      --p-status-icon: #f2f1f8;
+    }
+
+    /* Shared Neutral Light Phone Theme Tokens */
+    .phone-frame[data-phone-theme="light"] {
+      --p-bezel: #18181b;
+      --p-canvas: #f4f4f5;
+      --p-surface: #ffffff;
+      --p-surface-subtle: #e4e4e7;
+      --p-border: #e4e4e7;
+      --p-border-strong: #d4d4d8;
+      --p-text-primary: #18181b;
+      --p-text-muted: #52525b;
+      --p-text-subtle: #71717a;
+      --p-status-icon: #18181b;
       --p-card-shadow: none;
-      --p-sheet-backdrop: rgba(5, 4, 10, 0.7);
-      --p-menu-bg: #1c1a27;
-      --avatar-bg-1: #2e1065; --avatar-text-1: #c4b5fd;
-      --avatar-bg-2: #1e1b4b; --avatar-text-2: #a5b4fc;
-      --avatar-bg-3: #082f49; --avatar-text-3: #7dd3fc;
-      --avatar-bg-4: #052e16; --avatar-text-4: #86efac;
-      --avatar-bg-5: #451a03; --avatar-text-5: #fde68a;
-      --avatar-bg-6: #4c0519; --avatar-text-6: #fbcfe8;
+      --p-sheet-backdrop: rgba(0, 0, 0, 0.5);
+      --p-menu-bg: #ffffff;
+      --p-avatar-bg: #e4e4e7;
+      --p-avatar-text: #27272a;
+      --avatar-bg-1: #e4e4e7; --avatar-text-1: #27272a;
+      --avatar-bg-2: #e4e4e7; --avatar-text-2: #27272a;
+      --avatar-bg-3: #e4e4e7; --avatar-text-3: #27272a;
+      --avatar-bg-4: #e4e4e7; --avatar-text-4: #27272a;
+      --avatar-bg-5: #e4e4e7; --avatar-text-5: #27272a;
+      --avatar-bg-6: #e4e4e7; --avatar-text-6: #27272a;
+      --p-success: #15803d;
+      --p-success-bg: #dcfce7;
+      --p-warning: #b45309;
+      --p-warning-bg: #fef3c7;
+      --p-danger: #b91c1c;
+      --p-danger-bg: #fee2e2;
+    }
+
+    /* Spotify-inspired Charcoal / Green Palette (Default) */
+    .phone-frame[data-palette="green"],
+    .phone-frame:not([data-palette]) {
+      --p-accent: #1ed760;
+      --p-accent-dark: #169c46;
+      --p-accent-text: #1ed760;
+      --p-accent-container: #15291c;
+      --p-on-accent-container: #bbf7d0;
+      --p-on-accent: #000000;
+    }
+    .phone-frame[data-phone-theme="light"][data-palette="green"],
+    .phone-frame[data-phone-theme="light"]:not([data-palette]) {
+      --p-accent: #16a34a;
+      --p-accent-dark: #15803d;
+      --p-accent-text: #15803d;
+      --p-accent-container: #eaf7ed;
+      --p-on-accent-container: #14532d;
+      --p-on-accent: #000000;
+    }
+
+    /* Netflix-inspired Charcoal / Red Palette */
+    .phone-frame[data-palette="red"] {
+      --p-accent: #e50914;
+      --p-accent-dark: #b80710;
+      --p-accent-text: #ff5252;
+      --p-accent-container: #2b1214;
+      --p-on-accent-container: #fecaca;
+      --p-on-accent: #ffffff;
+    }
+    .phone-frame[data-phone-theme="light"][data-palette="red"] {
+      --p-accent: #dc2626;
+      --p-accent-dark: #b91c1c;
+      --p-accent-text: #b91c1c;
+      --p-accent-container: #fee2e2;
+      --p-on-accent-container: #7f1d1d;
+      --p-on-accent: #ffffff;
     }
 
     /* Phone Status Bar */
@@ -368,7 +401,7 @@
     .search-clear-btn:hover,
     .search-action-btn:hover {
       background: var(--p-surface-subtle);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     /* Small Section Heading below search capsule */
@@ -560,7 +593,7 @@
     }
 
     .context-tag.context-readlater {
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     /* Trailing favorite star button */
@@ -607,7 +640,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(88, 80, 156, 0.35);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
       cursor: pointer;
       z-index: 35;
       transition: transform 0.15s ease, background-color 0.15s ease;
@@ -640,7 +673,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       margin-bottom: 16px;
     }
 
@@ -707,7 +740,7 @@
     }
 
     .nav-tab-btn.active {
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     .nav-tab-label {
@@ -815,7 +848,7 @@
     }
 
     .menu-item-row.active {
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       font-weight: 600;
     }
 
@@ -939,7 +972,7 @@
 
     .sheet-action-btn:hover {
       border-color: var(--p-accent);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     .sheet-action-btn:active {
@@ -1003,7 +1036,7 @@
 
     .url-copy-btn:hover {
       border-color: var(--p-accent);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     /* Secondary toggles row */
@@ -1160,7 +1193,7 @@
     .section-action-link {
       font-size: 12px;
       font-weight: 600;
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       cursor: pointer;
       border: none;
       background: transparent;
@@ -1248,7 +1281,7 @@
       height: 36px;
       border-radius: 8px;
       background: var(--p-accent-container);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1289,7 +1322,7 @@
       height: 34px;
       border-radius: 8px;
       background: var(--p-surface-subtle);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1346,7 +1379,7 @@
       padding: 16px;
       border-radius: 16px;
       background: var(--p-accent-container);
-      border: 1px solid var(--p-accent);
+      border: 1px solid var(--p-border);
       margin-bottom: 12px;
     }
 
@@ -1355,7 +1388,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
     }
 
     .recap-metric {
@@ -1498,12 +1531,12 @@
       height: 64px;
       border-radius: 20px;
       background: var(--p-accent-container);
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(14, 116, 144, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .onboarding-heading {
@@ -1534,7 +1567,7 @@
     .privacy-card-title {
       font-size: 12px;
       font-weight: 700;
-      color: var(--p-accent);
+      color: var(--p-accent-text, var(--p-accent));
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1589,7 +1622,7 @@
     }
 
     /* ==========================================================================
-       SIMULATED NOTIFICATION BANNER (Real capture behavior)
+       SIMULATED NOTIFICATION BANNER (Plain native Android heads-up)
        ========================================================================== */
     .notification-banner-popup {
       position: absolute;
@@ -1597,10 +1630,10 @@
       left: 12px;
       right: 12px;
       background: var(--p-surface);
-      border: 1px solid var(--p-border-strong);
-      border-radius: 16px;
-      padding: 10px 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--p-border);
+      border-radius: 20px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
       z-index: 85;
       display: none;
       animation: bannerDrop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -1624,16 +1657,16 @@
     .notif-top-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 4px;
     }
 
     .notif-app-icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      background: var(--p-accent);
-      color: #ffffff;
+      width: 14px;
+      height: 14px;
+      border-radius: 0;
+      background: transparent;
+      color: var(--p-text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1641,10 +1674,10 @@
 
     .notif-app-name {
       font-size: 11px;
-      font-weight: 700;
-      color: var(--p-text-subtle);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+      font-weight: 500;
+      color: var(--p-text-muted);
+      letter-spacing: 0.1px;
+      text-transform: none;
     }
 
     .notif-time {
@@ -1654,38 +1687,43 @@
     }
 
     .notif-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       color: var(--p-text-primary);
+      line-height: 1.3;
     }
 
     .notif-body {
       font-size: 12px;
       color: var(--p-text-muted);
+      margin-top: 2px;
       margin-bottom: 8px;
     }
 
     .notif-actions-row {
       display: flex;
-      gap: 6px;
-      border-top: 1px solid var(--p-border);
-      padding-top: 6px;
+      align-items: center;
+      gap: 12px;
+      border-top: none;
+      padding-top: 4px;
     }
 
     .notif-act-btn {
       min-height: 44px;
-      padding: 0 10px;
-      font-size: 11px;
-      font-weight: 700;
-      border-radius: 6px;
+      padding: 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 4px;
       border: none;
       background: transparent;
-      color: var(--p-accent);
+      color: var(--p-text-primary);
       cursor: pointer;
     }
 
     .notif-act-btn:hover {
-      background: var(--p-surface-subtle);
+      background: transparent;
+      color: var(--p-text-muted);
+      text-decoration: underline;
     }
 
     /* Floating Toast / Snackbar */
@@ -1725,7 +1763,7 @@
     .toast-undo-btn {
       background: transparent;
       border: none;
-      color: #38bdf8;
+      color: var(--p-accent-text, var(--p-accent));
       font-weight: 700;
       font-size: 12px;
       min-height: 44px;
@@ -1747,15 +1785,23 @@
           <span class="review-brand-badge" aria-hidden="true"></span>
           <div>
             <h1 class="review-title">EasyLink Design System</h1>
-            <p class="review-subtitle">EAS-5 Android UI Refinement · Calm Blue-Teal / Slate</p>
+            <p class="review-subtitle">EAS-5 Android UI Refinement · Dark Neutral / Restrained Accent</p>
           </div>
         </div>
 
-        <!-- Phone Theme Toggle (Independent from host) -->
-        <button id="phoneThemeToggleBtn" class="review-btn" aria-label="Toggle Phone Frame Theme (Light or Dark)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span id="phoneThemeLabel">Phone: Light</span>
-        </button>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <!-- Review-only Palette Selector -->
+          <select id="paletteSelect" class="review-screens-select" aria-label="Review Palette Direction (Spotify Green or Netflix Red)" style="flex:1 1 auto; min-height:44px;">
+            <option value="green" selected>Palette: Spotify Charcoal / Green</option>
+            <option value="red">Palette: Netflix Charcoal / Red</option>
+          </select>
+
+          <!-- Phone Theme Toggle (Independent from host) -->
+          <button id="phoneThemeToggleBtn" class="review-btn" aria-label="Toggle Phone Frame Theme (Dark or Light)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span id="phoneThemeLabel">Phone: Dark</span>
+          </button>
+        </div>
       </div>
 
       <div class="review-actions-row">
@@ -1776,9 +1822,9 @@
         </button>
 
         <!-- Test Notification simulation button -->
-        <button id="simNotifBtn" class="review-btn" aria-label="Simulate Incoming Link Notification">
+        <button id="simNotifBtn" class="review-btn" aria-label="Simulate Native Android Heads-Up Notification">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span>Incoming Notification</span>
+          <span>Simulated Notification</span>
         </button>
       </div>
     </header>
@@ -1786,7 +1832,7 @@
     <!-- ======================================================================
          ANDROID MOBILE FRAME (MAX WIDTH CAPPED NEAR 440PX, NO VH UNITS)
          ====================================================================== -->
-    <div id="phoneFrame" class="phone-frame" data-phone-theme="light" role="region" aria-label="Android Mobile Device Preview">
+    <div id="phoneFrame" class="phone-frame" data-phone-theme="dark" data-palette="green" role="region" aria-label="Android Mobile Device Preview">
 
       <!-- Camera Punch-Hole cutout -->
       <div class="phone-camera-hole" aria-hidden="true"></div>
@@ -2099,12 +2145,12 @@
         <section id="screen-customize" class="screen-view" aria-label="Customize">
           <div class="section-title-group">
             <h2 class="section-heading">Theme &amp; Appearance</h2>
-            <p class="section-caption">Calm Blue-Teal / Slate system</p>
+            <p class="section-caption">Dark Neutral / Restrained Accent</p>
           </div>
           <div class="segmented-control" role="radiogroup" aria-label="Theme selection">
             <button class="segmented-btn" data-theme-val="system" role="radio" aria-checked="false">System</button>
-            <button class="segmented-btn active" data-theme-val="light" role="radio" aria-checked="true">Light</button>
-            <button class="segmented-btn" data-theme-val="dark" role="radio" aria-checked="false">Dark</button>
+            <button class="segmented-btn" data-theme-val="light" role="radio" aria-checked="false">Light</button>
+            <button class="segmented-btn active" data-theme-val="dark" role="radio" aria-checked="true">Dark</button>
           </div>
 
           <div class="section-title-group" style="margin-top:16px;">
@@ -2117,7 +2163,7 @@
                 <span class="settings-label">Link actions (Default)</span>
                 <span class="settings-sublabel">Row swipe archives or bins; strip taps switch lists</span>
               </div>
-              <span style="color:var(--p-accent); font-weight:700;">✓</span>
+              <span style="color:var(--p-accent-text, var(--p-accent)); font-weight:700;">✓</span>
             </div>
             <div class="settings-row">
               <div class="settings-row-text">
@@ -2287,22 +2333,22 @@
       </div>
 
       <!-- ====================================================================
-           MODAL 4: SIMULATED INCOMING NOTIFICATION BANNER
+           MODAL 4: SIMULATED INCOMING NOTIFICATION (Native Android Heads-Up)
            ==================================================================== -->
-      <div id="simNotifBanner" class="notification-banner-popup" role="status" aria-live="polite">
+      <div id="simNotifBanner" class="notification-banner-popup" role="status" aria-label="Simulated Native Android Heads-Up Notification" aria-live="polite">
         <div class="notif-top-row">
           <div class="notif-app-icon" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7v8l10-12h-7z"/></svg>
           </div>
-          <span class="notif-app-name">EasyLink · Link Detected</span>
+          <span class="notif-app-name">EasyLink</span>
           <span class="notif-time">Just now</span>
         </div>
         <div class="notif-title">Rohit shared a link</div>
-        <div class="notif-body">deepmind.google · Next-Gen AI Workflows</div>
+        <div class="notif-body">deepmind.google</div>
         <div class="notif-actions-row">
           <button id="notifOpenBtn" class="notif-act-btn">Open</button>
           <button id="notifCopyBtn" class="notif-act-btn">Copy</button>
-          <button id="notifMuteBtn" class="notif-act-btn" style="color:var(--p-danger);">Mute Rohit</button>
+          <button id="notifMuteBtn" class="notif-act-btn">Mute</button>
         </div>
       </div>
 
@@ -2433,16 +2479,16 @@
         }
       ];
 
-      // Categories configuration
+      // Categories configuration (Restrained neutral & accent tints, no blue/violet/cyan)
       const CATEGORIES = [
-        { key: "article", label: "Articles", color: "#0284c7" },
-        { key: "video", label: "Videos", color: "#0d9488" },
-        { key: "documents", label: "Documents", color: "#475569" },
-        { key: "social", label: "Social", color: "#4f46e5" },
-        { key: "shopping", label: "Shopping", color: "#d97706" },
-        { key: "maps", label: "Maps", color: "#059669" },
-        { key: "music", label: "Music", color: "#7c3aed" },
-        { key: "other", label: "Other", color: "#0891b2" }
+        { key: "article", label: "Articles", color: "var(--p-text-muted)" },
+        { key: "video", label: "Videos", color: "var(--p-text-subtle)" },
+        { key: "documents", label: "Documents", color: "var(--p-border-strong)" },
+        { key: "social", label: "Social", color: "var(--p-accent)" },
+        { key: "shopping", label: "Shopping", color: "var(--p-text-muted)" },
+        { key: "maps", label: "Maps", color: "var(--p-text-subtle)" },
+        { key: "music", label: "Music", color: "var(--p-accent)" },
+        { key: "other", label: "Other", color: "var(--p-border-strong)" }
       ];
 
       // Application State
@@ -2453,12 +2499,14 @@
       let currentSearch = '';
       let selectedLinkForSheet = null;
       let lastArchivedOrDeleted = null;
-      let phoneTheme = 'light';
+      let phoneTheme = 'dark';
+      let currentPalette = 'green';
 
       // Elements
       const phoneFrame = document.getElementById('phoneFrame');
       const phoneThemeToggleBtn = document.getElementById('phoneThemeToggleBtn');
       const phoneThemeLabel = document.getElementById('phoneThemeLabel');
+      const paletteSelect = document.getElementById('paletteSelect');
       const screenSelect = document.getElementById('screenSelect');
       const dataStateToggleBtn = document.getElementById('dataStateToggleBtn');
       const dataStateLabel = document.getElementById('dataStateLabel');
@@ -2574,18 +2622,9 @@
         } else {
           initials = name.slice(0, 2).toUpperCase();
         }
-        const palettes = [
-          { bg: 'var(--avatar-bg-1)', color: 'var(--avatar-text-1)' },
-          { bg: 'var(--avatar-bg-2)', color: 'var(--avatar-text-2)' },
-          { bg: 'var(--avatar-bg-3)', color: 'var(--avatar-text-3)' },
-          { bg: 'var(--avatar-bg-4)', color: 'var(--avatar-text-4)' },
-          { bg: 'var(--avatar-bg-5)', color: 'var(--avatar-text-5)' },
-          { bg: 'var(--avatar-bg-6)', color: 'var(--avatar-text-6)' },
-        ];
-        const idx = Math.abs(link.id) % palettes.length;
         return {
           initials,
-          style: `background:${palettes[idx].bg}; color:${palettes[idx].color};`
+          style: 'background:var(--p-avatar-bg); color:var(--p-avatar-text);'
         };
       }
 
@@ -3040,6 +3079,17 @@
           renderInbox();
         });
       });
+
+      // Palette Selector (Review-only toggle between Spotify Green and Netflix Red)
+      if (paletteSelect) {
+        paletteSelect.value = currentPalette;
+        paletteSelect.addEventListener('change', (e) => {
+          currentPalette = e.target.value;
+          phoneFrame.setAttribute('data-palette', currentPalette);
+          const name = currentPalette === 'green' ? 'Spotify Charcoal / Green' : 'Netflix Charcoal / Red';
+          showToast(`Palette: ${name}`);
+        });
+      }
 
       // Phone Theme Toggle (Independent from host)
       phoneThemeToggleBtn.addEventListener('click', () => {
